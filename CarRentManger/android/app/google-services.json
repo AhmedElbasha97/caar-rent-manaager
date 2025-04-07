@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "271658788648",
+    "project_id": "carrentmanger",
+    "storage_bucket": "carrentmanger.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271658788648:android:a16bc1ff6c3897b6f2921d",
+        "android_client_info": {
+          "package_name": "com.sync.carrentmanger"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH-G4E9lgqjWXaI5m5HteK1fpJugYDuTE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
