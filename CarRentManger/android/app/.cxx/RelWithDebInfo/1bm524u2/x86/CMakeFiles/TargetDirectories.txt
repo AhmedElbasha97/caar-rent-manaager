@@ -1,0 +1,2 @@
+C:/Users/elbasha/Desktop/caar-rent-manaager/CarRentManger/android/app/.cxx/RelWithDebInfo/1bm524u2/x86/CMakeFiles/edit_cache.dir
+C:/Users/elbasha/Desktop/caar-rent-manaager/CarRentManger/android/app/.cxx/RelWithDebInfo/1bm524u2/x86/CMakeFiles/rebuild_cache.dir

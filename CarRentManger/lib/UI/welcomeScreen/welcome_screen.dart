@@ -59,62 +59,8 @@ class WelcomeScreen extends StatelessWidget {
                   child: SizedBox(
                     width: Get.width*0.9,
                     child:  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        InkWell(
-                          onTap: (){
-                            Get.offAll( const WebViewContainer("https://carrentmanager.com/"));
-                            },
-                          child: Row(
-                            children: [
-                              Get.find<StorageService>().activeLocale == SupportedLocales.english? const Stack(
-                                children: [
-
-                                  Icon(Icons.arrow_circle_left,color: kWhiteColor,size: 30,),
-                                  Icon(Icons.arrow_circle_left_outlined,color: kDarkBlueColor,size: 30,),
-                                ],
-                              ):const Stack(
-                                children: [
-
-                                  Icon(Icons.arrow_circle_right,color: kWhiteColor,size: 30,),
-                                  Icon(Icons.arrow_circle_right_outlined,color: kDarkBlueColor,size: 30,),
-                                ],
-                              ),
-                              const SizedBox(width: 5,),
-                              Stack(
-                                children: [
-                                  // Implement the stroke
-                                  CustomText(
-                                    skipKey.tr,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      letterSpacing: 0,
-                                      fontWeight: FontWeight.w900,
-                                      fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                      foreground: Paint()
-                                        ..style = PaintingStyle.stroke
-                                        ..strokeWidth =1
-                                        ..color = kWhiteColor,
-                                    ),
-                                  ),
-                                  // The text inside
-                                  CustomText(
-                                    skipKey.tr,
-                                    style:  TextStyle(
-                                      fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                      color: kDarkBlueColor,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 12,
-                                      letterSpacing: 0,
-
-                                    ),
-                                  )
-                                ],
-                              ),
-
-                            ],
-                          ),
-                        ),
                         InkWell(
                           onTap: (){
                             Get.find<LocalizationService>().toggleLocale();
@@ -172,7 +118,8 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                Image.asset("assets/images/app_logo.png",width: Get.width*0.7,height: Get.height*0.6,),
+                SizedBox(height: Get.height*0.17,),
+                Image.asset("assets/images/app_logo.png",width: Get.width*0.8,height: Get.height*0.3,),
                 InkWell(
                   onTap: (){
                     Get.to(()=> const SignInScreen(),transition: Transition.rightToLeftWithFade);
@@ -237,6 +184,46 @@ class WelcomeScreen extends StatelessWidget {
                           child:  Center(
                             child: CustomText(
                               signUpBTN.tr,
+                              style:  TextStyle(
+                                fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                color: kWhiteColor,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+
+                                height: 1,
+                                letterSpacing: -1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 5,),
+                InkWell(
+                  onTap: (){
+                    Get.to(()=>const WebViewContainer("https://carrentmanager.com/"),transition: Transition.leftToRightWithFade);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(color: kLightGreenColor,width: 2)
+                      ),
+                      child:Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Container(
+                          width: Get.width*0.8,
+                          height: Get.height*0.07,
+                          decoration: BoxDecoration(
+                            color: kDarkBlueColor,
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child:  Center(
+                            child: CustomText(
+                              Get.find<StorageService>().activeLocale == SupportedLocales.english?"Enter as a guest":"الدخول كزائر",
                               style:  TextStyle(
                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                 color: kWhiteColor,

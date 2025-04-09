@@ -1,0 +1,2 @@
+C:/Users/elbasha/Desktop/caar-rent-manaager/CarRentManger/android/app/.cxx/Debug/1p3g3726/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/elbasha/Desktop/caar-rent-manaager/CarRentManger/android/app/.cxx/Debug/1p3g3726/x86_64/CMakeFiles/rebuild_cache.dir
