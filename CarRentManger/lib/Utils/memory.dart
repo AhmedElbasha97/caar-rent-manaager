@@ -12,7 +12,8 @@ abstract class StorageKeys {
   static const String signingUp = "signing_Up";
   static const String notificationPage = "Notification_Page";
   static const String notificationPageId = "Notification_Page_Id";
-
+  static const String userPhoneNumber = "User_Phone_Number";
+  static const String userCountryCode = "User_Country_Code";
 }
 
 class StorageService extends GetxService {
@@ -37,6 +38,10 @@ class StorageService extends GetxService {
       _prefs.setString(StorageKeys.notificationPage, notificationPage);
   Future<void> saveNotificationPageId(String notificationPageId) async =>
       _prefs.setString(StorageKeys.notificationPageId, notificationPageId);
+  Future<void> saveUserPhoneNumber(String userPhoneNumber) async =>
+      _prefs.setString(StorageKeys.userPhoneNumber, userPhoneNumber);
+  Future<void> saveUserCountryCode(String userCountryCode) async =>
+      _prefs.setString(StorageKeys.userCountryCode, userCountryCode);
 
 
   Future<void> saveCheckerSigningUp(bool checker) async =>
@@ -55,8 +60,15 @@ class StorageService extends GetxService {
   }
   String get getNotificationPage {
     return _prefs.getString(StorageKeys.notificationPage)?? "0";
-  }  String get getNotificationPageId {
+  }
+  String get getNotificationPageId {
     return _prefs.getString(StorageKeys.notificationPageId)?? "0";
+  }
+  String get getUserPhoneNumber {
+    return _prefs.getString(StorageKeys.userPhoneNumber)?? "0";
+  }
+  String get getUserCountryCode {
+    return _prefs.getString(StorageKeys.userCountryCode)?? "0";
   }
   bool get getCheckerSigningUp {
     return _prefs.getBool(StorageKeys.signingUp)??true;
@@ -66,6 +78,8 @@ class StorageService extends GetxService {
   removeOtpCode(){
     _prefs.remove(StorageKeys.userOtp);
     _prefs.remove(StorageKeys.signingUp);
+    _prefs.remove(StorageKeys.userPhoneNumber);
+    _prefs.remove(StorageKeys.userCountryCode);
   }
 
   loggingOut(){

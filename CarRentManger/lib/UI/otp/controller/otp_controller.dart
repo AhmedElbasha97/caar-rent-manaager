@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:carrentmanger/Services/auth_services.dart';
 import 'package:carrentmanger/UI/homeScreen/home_screen.dart';
@@ -23,8 +25,32 @@ class OTPController extends GetxController{
   late FocusNode text1FocusNode ;
   final _validatorHelber = ValidatorHelper.instance;
   bool formValidated = false;
+  RxInt remainingSeconds = 60.obs;
+  Timer? _timer;
+bool isResendingOTPCode = false;
+  void startTimer() {
+    remainingSeconds.value = 60;
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (remainingSeconds.value > 0) {
+        remainingSeconds.value--;
+      } else {
+        timer.cancel();
+      }
+    });
+  }
 
+  void resetTimer() {
+    startTimer();
+  }
 
+  @override
+  void onClose() {
+    _timer?.cancel();
+    nameController.dispose();
+    text1FocusNode.dispose();
+    super.onClose();
+  }
 
   @override
   void onInit() {
@@ -32,14 +58,10 @@ class OTPController extends GetxController{
     nameController = TextEditingController();
     text1FocusNode = FocusNode();
     checkForUpgrades();
+    startTimer();
   }
 
-  @override
-  void onClose() {
-    nameController.dispose();
-    text1FocusNode.dispose();
-    super.onClose();
-  }
+
 
   void clear() {
     nameController.clear();
@@ -71,28 +93,30 @@ class OTPController extends GetxController{
     }
     return validateName;
   }
-  checkForUpgrades() {
-    InAppUpdate.checkForUpdate().then((updateInfo) {
-      if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
-        if (updateInfo.immediateUpdateAllowed) {
-          // Perform immediate update
-          InAppUpdate.performImmediateUpdate().then((appUpdateResult) {
-            if (appUpdateResult == AppUpdateResult.success) {
-              //App Update successful
-            }
-          });
-        } else if (updateInfo.flexibleUpdateAllowed) {
-          //Perform flexible update
-          InAppUpdate.startFlexibleUpdate().then((appUpdateResult) {
-            if (appUpdateResult == AppUpdateResult.success) {
-              //App Update successful
-              InAppUpdate.completeFlexibleUpdate();
-            }
-          });
+
+  checkForUpgrades() async {
+
+      try {
+        final updateInfo = await InAppUpdate.checkForUpdate();
+
+        if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
+          // يوجد تحديث متاح، تقدر تختار:
+          // 1. Immediate (تحديث إجباري)
+          // 2. Flexible (تحديث اختياري)
+
+          // مثال على التحديث الفوري:
+          InAppUpdate.performImmediateUpdate();
+
+          // أو لو تفضل تحديث مرن:
+          // InAppUpdate.startFlexibleUpdate().then((_) {
+          //   InAppUpdate.completeFlexibleUpdate();
+          // });
         }
+      } catch (e) {
+        print("Error checking for update: $e");
       }
-    });
-  }
+    }
+
   getBackToAnotherScreen(BuildContext context) async {
     bool checker = await Navigator.maybePop(context);
     if(!checker){
@@ -100,6 +124,92 @@ class OTPController extends GetxController{
         Get.to(()=>const SignInScreen());
       }else{
         Get.to(()=>const SignInScreen());
+      }
+    }
+  }
+  resendingCode(BuildContext context) async {
+
+    if(isResendingOTPCode){
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.info,
+          animType: AnimType.rightSlide,
+          title: Get
+              .find<StorageService>()
+              .activeLocale ==
+              SupportedLocales.english
+              ? "please wait ...":"انتظر من فضلك ...",
+          desc: Get
+              .find<StorageService>()
+              .activeLocale ==
+              SupportedLocales.english
+              ? "We are sending the OTP code again.":"نحن نرسل رمز التحقق مرة إخرى",
+
+          btnCancelText: Get
+              .find<StorageService>()
+              .activeLocale == SupportedLocales.english
+              ?"no":"لا",
+          btnOkText: Get
+              .find<StorageService>()
+              .activeLocale == SupportedLocales.english
+              ?"yes":"نعم",
+          btnCancelOnPress: () {},
+          btnOkOnPress: () {},
+        ).show();
+
+    }else {
+
+      ResponseModel? data = await AuthServices.resendNewOTP();
+      isResendingOTPCode = true;
+      update();
+      print(data?.msg);
+      if (data?.msg == "succeeded") {
+        final snackBar = SnackBar(content:
+        Row(children: [
+          const Icon(Icons.check, color: Colors.white,),
+          const SizedBox(width: 10,),
+          Text(Get
+              .find<StorageService>()
+              .activeLocale ==
+              SupportedLocales.english
+              ? 'The OTP Code has been sent successfully'
+              : 'تم إرسال رمز التحقق بنجاح', style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold
+          ),
+          ),
+        ],),
+            backgroundColor: Colors.green
+        );
+        update();
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        isResendingOTPCode = false;
+        resetTimer();
+        update();
+      }
+      else {
+        update();
+        final snackBar = SnackBar(content:
+        Row(children: [
+          const Icon(Icons.close, color: Colors.white,),
+          const SizedBox(width: 10,),
+          Text(Get
+              .find<StorageService>()
+              .activeLocale ==
+              SupportedLocales.english
+              ? 'An error occurred while Resending the otp code'
+              : 'حدث خطأ أثناء إعادة إرسال رمز التحقق', style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold
+          ),
+          ),
+        ],),
+            backgroundColor: Colors.red
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        isResendingOTPCode = false;
+        resetTimer();
       }
     }
   }

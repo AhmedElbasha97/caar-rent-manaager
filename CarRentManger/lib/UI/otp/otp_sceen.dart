@@ -9,6 +9,9 @@ import 'package:carrentmanger/Widget/text_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../signIn/signin_screen.dart';
+import '../signUp/signup_screen.dart';
+
 class OtpScreen extends StatelessWidget {
   const OtpScreen({super.key, required this.comingFromSignUp, });
   final  bool comingFromSignUp;
@@ -39,7 +42,12 @@ class OtpScreen extends StatelessWidget {
                     children: [
                       Get.find<StorageService>().activeLocale == SupportedLocales.english? InkWell(
                         onTap: (){
-                          Get.back();
+                          if(comingFromSignUp){
+                            Get.off(()=>const SignUpScreen(),transition: Get.find<StorageService>().activeLocale == SupportedLocales.english?Transition.rightToLeftWithFade:Transition.leftToRightWithFade);
+                          }else{
+                            Get.off(()=>const SignInScreen(),transition: Get.find<StorageService>().activeLocale == SupportedLocales.english?Transition.rightToLeftWithFade:Transition.leftToRightWithFade);
+
+                          }
                         },
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
@@ -53,7 +61,13 @@ class OtpScreen extends StatelessWidget {
                       ):
                       InkWell(
                         onTap: (){
-                          Get.back();
+                          if(comingFromSignUp){
+                            Get.off(()=>const SignUpScreen(),transition: Get.find<StorageService>().activeLocale == SupportedLocales.english?Transition.rightToLeftWithFade:Transition.leftToRightWithFade);
+                          }else{
+                            Get.off(()=>const SignInScreen(),transition: Get.find<StorageService>().activeLocale == SupportedLocales.english?Transition.rightToLeftWithFade:Transition.leftToRightWithFade);
+
+                          }
+
                         },
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
@@ -90,24 +104,39 @@ class OtpScreen extends StatelessWidget {
                           ],
                         ),
                       ),Container(
-                        width: Get.width*0.7,
-                        height: Get.height*0.08,
+                        width: Get.width,
+                        height: Get.height*0.13,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
 
                             Padding(
                               padding: const EdgeInsets.fromLTRB(18.0,10,25,0),
-                              child:    CustomText(
-                                Get.find<StorageService>().activeLocale == SupportedLocales.english?"Enter the verification code \n you received on WhatsApp":"أدخل كود التحقق الذي  \nوصلك على الواتس اب",
+                              child:    Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    Get.find<StorageService>().activeLocale == SupportedLocales.english?"Enter the verification code \n you received on WhatsApp":" أدخل كود التحقق الذي  \nوصلك على الواتس اب على رقم ",
 
-                                style:  TextStyle(
-                                  fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                  color: kDarkBlueColor,
-                                  fontSize: 18,
-                                  letterSpacing: 0,
+                                    style:  TextStyle(
+                                      fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                      color: kDarkBlueColor,
+                                      fontSize: 18,
+                                      letterSpacing: 0,
 
-                                ),
+                                    ),
+                                  ),
+                                  CustomText(
+                                      "${ Get.find<StorageService>().getUserPhoneNumber} (${ Get.find<StorageService>().getUserCountryCode}+) ",
+                                    style:  TextStyle(
+                                      fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                      color: kLightGreenColor,
+                                      fontSize: 18,
+                                      letterSpacing: 0,
+
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -145,6 +174,73 @@ class OtpScreen extends StatelessWidget {
                         ),
                       ),
 
+                  Center(
+                    child: Obx(() {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CustomText(
+                                Get.find<StorageService>().activeLocale == SupportedLocales.english?"Resend code in:":"إعادة إرسال الرمز في:",
+                                style:  TextStyle(
+                                  fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                  color: kDarkBlueColor,
+                                  fontSize: 18,
+                                  letterSpacing: 0,
+
+                                ),
+                              ),  CustomText(
+                                Get.find<StorageService>().activeLocale == SupportedLocales.english?" ${controller.remainingSeconds.value}s":"${controller.remainingSeconds.value}ثانية",
+                                style:  TextStyle(
+                                  fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                  color: kLightGreenColor,
+                                  fontSize: 18,
+                                  letterSpacing: 0,
+
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          InkWell(
+                            onTap: (){
+                              if(controller.remainingSeconds.value == 0){
+                              controller.resendingCode( context);
+                              }
+                            },
+                            child: Center(
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                     WidgetSpan(
+                                      child: Icon(Icons.restart_alt, size: 20,color:  controller.remainingSeconds.value == 0?kLightGreenColor:kGreyColor,
+                                      ),
+                                    ),
+
+                                    TextSpan(
+                                      text:Get.find<StorageService>().activeLocale == SupportedLocales.english?"Resend code":"إعادة إرسال الرمز",
+                                      style:  TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                        color:  controller.remainingSeconds.value == 0?kLightGreenColor:kGreyColor,
+                                        fontSize: 18,
+                                        letterSpacing: 0,
+
+                                      ),
+                                    ),
+
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      );
+                    }),
+                  ),
 
 
                       const SizedBox(

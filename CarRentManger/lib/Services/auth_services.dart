@@ -108,6 +108,17 @@ class AuthServices {
     }
     return null;
   }
+  static Future<ResponseModel?>resendNewOTP() async {
+    var data = await api.request(Services.resendNewOTPEndPoint, "POST", queryParamters: {
+      "phone_code": Get.find<StorageService>().getUserCountryCode,
+      "phone": Get.find<StorageService>().getUserPhoneNumber,
+      "otp": Get.find<StorageService>().getUserOtp,
+    },);
+    if (data != null) {
+      return ResponseModel.fromJson(data);
+    }
+    return null;
+  }
 
 
 

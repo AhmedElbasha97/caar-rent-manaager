@@ -12,6 +12,7 @@ import '../../Utils/memory.dart';
 import '../../Utils/translation_key.dart';
 import '../../Widget/custom_text_widget.dart';
 import '../../Widget/text_field_widget.dart';
+import '../signUp/signup_screen.dart';
 import 'controller/signin_controller.dart';
 
 class SignInScreen extends StatelessWidget {
@@ -177,7 +178,7 @@ class SignInScreen extends StatelessWidget {
                                     width: 5,
                                   ),
                                   CustomText(
-                                    "   ${controller.selectedCountryCode?.code??signUpTextPhoneKey.tr}    ",
+                                    "   ${controller.selectedCountryCode?.code??"wait"}    ",
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       fontFamily: Get.find<
@@ -261,7 +262,7 @@ class SignInScreen extends StatelessWidget {
                                   ),
 
                                   CustomText(
-                                    "   ${controller.selectedCountryCode?.code??signUpTextPhoneKey.tr}    ",
+                                    "   ${controller.selectedCountryCode?.code??"wait"}    ",
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       fontFamily: Get.find<
@@ -345,7 +346,7 @@ class SignInScreen extends StatelessWidget {
                                     width: 5,
                                   ),
                                   CustomText(
-                                    "   ${controller.selectedCountryCode?.code??signUpTextPhoneKey.tr}    ",
+                                    "   ${controller.selectedCountryCode?.code??"wait"}    ",
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       fontFamily: Get.find<
@@ -412,6 +413,40 @@ class SignInScreen extends StatelessWidget {
                               ),
                             ),
                           ),
+                        ),
+                      ),
+                      const SizedBox(height: 10,),
+                      SizedBox(
+                        width: Get.width,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children:   [
+                            CustomText(signInText1.tr,
+                              textAlign: TextAlign.center,
+                              style:  TextStyle(
+                                  fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                  color: kDarkBlueColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15),),
+                            const SizedBox(width: 5,),
+                            InkWell(
+                              onTap: (){
+                                Get.off(()=>const SignUpScreen(),transition: Get.find<StorageService>().activeLocale == SupportedLocales.english?Transition.rightToLeftWithFade:Transition.leftToRightWithFade);
+
+
+                              },
+                              child:  CustomText(signInText2.tr,
+                                textAlign: TextAlign.center,
+                                style:  TextStyle(
+                                    fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                    color: kLightGreenColor,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15),),
+                            ),
+
+
+
+                          ],
                         ),
                       ),
                     ],

@@ -100,6 +100,8 @@ class AppTranslations extends Translations {
       addingCarToRent:"Add a car for rent",
       drawerWidget8:"Terms of Use",
       drawerWidget9:"Privacy Policy",
+      signInText1:"Don't have an account?",
+      signInText2:"Create an account",
 
     },
     "ar": {
@@ -141,7 +143,8 @@ class AppTranslations extends Translations {
       termsAndCondition: "الأحكام والشروط",
       and:" و ",
       otpAlert:"الكود المرسل غير مطابق الكود الذى تم إدخاله يرجى مراجعه الواتس اب",
-
+      signUpText1: "هل لديك حساب بالفعل؟",
+      signUpText2: "تسجيل الدخول" ,
       welcomeText:"مرحباً",
       rateLastRideText:"قيم أخر سياره مؤجرة",
       verifyMyPaper:"تحقق من حسابك",
@@ -195,6 +198,8 @@ class AppTranslations extends Translations {
       addingCarToRent:"أضف سيارة للإيجار",
       drawerWidget8:"شروط الإستخدام",
       drawerWidget9:"سياسة الخصوصية",
+      signInText1:"ليس لديك حساب؟",
+      signInText2:" إنشاء حساب",
     }
   };
 }

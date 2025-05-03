@@ -9,20 +9,29 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 
-
 class PushNotificationService {
-
-
   Future<void> setupInteractedMessage() async {
     await Firebase.initializeApp();
-    FirebaseMessaging.instance.requestPermission();
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      var type= message.data["page"];
+    // ✅ اطلب الإذن بشكل سليم
+    final settings = await FirebaseMessaging.instance.requestPermission();
+    print('User granted permission: ${settings.authorizationStatus}');
+
+    // ✅ تعامل مع الحالة اللي التطبيق كان مقفول وفتح من الإشعار
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      var type = initialMessage.data["page"];
       SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("route", type);
+    }
 
+    // ✅ تعامل مع حالة onMessageOpenedApp
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+      var type = message.data["page"];
+      SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString("route", type);
     });
+
     await enableIOSNotifications();
     await registerNotificationListeners();
   }
@@ -31,30 +40,32 @@ class PushNotificationService {
     AndroidNotificationChannel channel = androidNotificationChannel();
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
     await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
+
     var androidSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
-    var iOSSettings =  const DarwinInitializationSettings(
+    var iOSSettings = const DarwinInitializationSettings(
       requestSoundPermission: true,
       requestBadgePermission: true,
       requestAlertPermission: true,
     );
-    var initSetttings =
-    InitializationSettings(android: androidSettings, iOS: iOSSettings);
-    flutterLocalNotificationsPlugin.initialize(initSetttings,onDidReceiveNotificationResponse:  (message) async {
-      notificationSelectingAction(message);
-    }
+    var initSetttings = InitializationSettings(android: androidSettings, iOS: iOSSettings);
+
+    flutterLocalNotificationsPlugin.initialize(initSetttings,
+      onDidReceiveNotificationResponse: (message) async {
+        notificationSelectingAction(message);
+      },
     );
 
     FirebaseMessaging.onMessage.listen((RemoteMessage? message) async {
       RemoteNotification? notification = message!.notification;
       AndroidNotification? android = message.notification?.android;
-      var type= message.data["page"];
+      var type = message.data["page"];
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
       prefs.setString("route", type);
+
       if (notification != null && android != null) {
         flutterLocalNotificationsPlugin.show(
           notification.hashCode,
@@ -64,7 +75,6 @@ class PushNotificationService {
             android: AndroidNotificationDetails(
               channel.id,
               channel.name,
-
               icon: android.smallIcon,
               playSound: true,
             ),
@@ -73,32 +83,27 @@ class PushNotificationService {
       }
     });
   }
+
   enableIOSNotifications() async {
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
-      alert: true, // Required to display a heads up notification
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true,
       badge: true,
       sound: true,
     );
   }
-  static Future<void> notificationSelectingAction( message,) async {
+
+  static Future<void> notificationSelectingAction(message) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
-
-
     String? userType = prefs.getString("type");
-    print(userType??""+"usertype");
-   String? screenType =  prefs.getString("route");
-   print(screenType??""+"screenType");
-   print(screenType??""+"screenType");
+    print('${userType ?? ""} userType');
 
+    String? screenType = prefs.getString("route");
+    print('${screenType ?? ""} screenType');
   }
 
-
   androidNotificationChannel() => const AndroidNotificationChannel(
-    'high_importance_channel', // id
-    'High Importance Notifications', // title
-
+    'high_importance_channel',
+    'High Importance Notifications',
     importance: Importance.max,
   );
 }

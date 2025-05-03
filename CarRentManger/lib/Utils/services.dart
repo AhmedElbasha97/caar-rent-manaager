@@ -23,4 +23,5 @@ class Services {
  static String deletingAccountEndPoint = "member_delete";//Post
  static String getTermsAndConditionsEndPoint = "terms";//Post
  static String getPrivacyPolicyEndPoint = "policy";//Post
+ static String resendNewOTPEndPoint = "send_otp";//Post
 }

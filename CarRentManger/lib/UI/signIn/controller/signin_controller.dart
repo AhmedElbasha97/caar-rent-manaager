@@ -141,11 +141,22 @@ class LoginController extends GetxController{
     await placemarkFromCoordinates(lat, long);
     Placemark placeMark = i.first;
 
+    bool isFoundCountry = false;
     for(var countryCode in countriesCodesList!){
       if(placeMark.country == countryCode.name){
         selectedCountryCode = countryCode;
         isLoading = false;
+        isFoundCountry = true;
         update();
+      }
+    }
+    if(!isFoundCountry){
+      for(var countryCode in countriesCodesList!){
+        if("Qatar" == countryCode.name){
+          selectedCountryCode = countryCode;
+          isLoading = false;
+          update();
+        }
       }
     }
 
@@ -343,6 +354,10 @@ class LoginController extends GetxController{
                 "${data?.info?.opt ?? 0}");
             await Get.find<StorageService>().saveAccountName(
                 data?.info?.name ?? "");
+            await Get.find<StorageService>().saveUserPhoneNumber(
+                " ${phoneController.text ?? ""}");
+            await Get.find<StorageService>().saveUserCountryCode(
+                " ${selectedCountryCode?.code ?? ""}");
             await Get.find<StorageService>().saveCheckerSigningUp(false);
             buttonStatus = "success";
             update();
