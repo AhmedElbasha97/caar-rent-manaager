@@ -199,35 +199,204 @@ class AdvancedSearchScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                controller.isLoading? Loader(height: Get.height*0.84,):Container(
-                  height: Get.height*0.84,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                          child:  RawScrollbar(
-                            thumbColor: kDarkGreenColor,
-                            radius: const Radius.circular(20),
-                            thickness: 5,
-                            child: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 10,),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 10,),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                controller.isLoading? Expanded(child: Loader(height: Get.height*0.84,)):Expanded(
+                  child: Container(
+                    height: Get.height*0.84,
+                    child: SingleChildScrollView(
+                      controller: controller.scrollController,
+
+                      child: Column(
+                        children: [
+                          Container(
+                            child:  Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 10,),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 10,),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                      child: CustomText(
+                                        textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        "${
+                                            Get.find<StorageService>().activeLocale ==
+                                                SupportedLocales.english
+                                                ? "county"
+                                                : "الدوله"
+                                        } : ",
+                                        style: TextStyle(
+                                          shadows: <Shadow>[
+                                            Shadow(
+                                                offset:
+                                                const Offset(0.5, 0.5),
+                                                blurRadius: 0.5,
+                                                color: Colors.black
+                                                    .withValues(alpha:0.5)),
+                                          ],
+                                          fontSize: 15,
+                                          letterSpacing: 0,
+                                          fontFamily:
+                                          Get.find<StorageService>()
+                                              .activeLocale ==
+                                              SupportedLocales.english
+                                              ? fontFamilyEnglishName
+                                              : fontFamilyArabicName,
+                                          color: kDarkGreenColor,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10,),
+
+                                    Center(
+                                      child: InkWell(
+                                          onTap: (){
+                                             controller.choosingCountryCode(context);
+                                      },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            width:Get.width*0.9,
+                                            height:Get.height*0.06,
+
+                                            decoration: BoxDecoration(
+
+                                                borderRadius: BorderRadius.circular(50),
+                                                border: Border.all(color: kDarkGreenColor,width: 2)
+
+                                            ),
+                                            child:Padding(
+                                              padding: const EdgeInsets.all(5.0),
+                                              child: Container(
+
+                                                decoration: BoxDecoration(
+                                                  color: kDarkBlueColor,
+                                                  borderRadius: BorderRadius.circular(50),
+                                                ),
+                                                child:
+                                                Center(child:
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  children: [
+                                                    controller.chosenCountry == null?CustomText(
+                                                      Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose county":"أختر الدوله",
+                                                      style:  TextStyle(
+                                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                        color: kWhiteColor,
+                                                        fontSize: 15,
+                                                        height: 1,
+                                                        letterSpacing: -1,
+                                                      ),
+                                                    ):Row(
+                                                      children: [
+                                                        CustomText(
+                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose county:":"الدوله المختاره:",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 20,
+                                                        ),
+                                                        CachedNetworkImage(
+                                                          imageUrl:"${Services.baseEndPoint}${controller.chosenCountry?.flag}",
+                                                          imageBuilder: ((context, image) {
+                                                            return Container(
+                                                                height: Get.height * 0.04,
+                                                                width: Get.width * 0.07,
+
+                                                                decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(10),
+
+                                                                  image: DecorationImage(
+                                                                    image: image,
+                                                                    fit: BoxFit.fitWidth,
+                                                                  ),
+                                                                ));
+                                                          }),
+                                                          placeholder: (context, image) {
+                                                            return Padding(
+                                                              padding: const EdgeInsets.all(5),
+                                                              child: Container(
+                                                                  decoration: const BoxDecoration(
+                                                                      borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              15))),
+                                                                  child:const CircularProgressIndicator(
+                                                                    color: kDarkGreenColor,
+                                                                  )),
+                                                            );
+                                                          },
+                                                          errorWidget: (context, url, error) {
+                                                            return Container(
+                                                                height: Get.height * 0.04,
+                                                                width: Get.width * 0.07,
+
+                                                                decoration: const BoxDecoration(
+
+                                                                    image: DecorationImage(
+                                                                      image: AssetImage(
+                                                                          "assets/images/27002.jpg"),
+                                                                      fit: BoxFit.fitHeight,
+                                                                    ),
+                                                                    borderRadius:
+                                                                    BorderRadius.all(
+                                                                        Radius.circular(
+                                                                            10))));
+                                                          },
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        CustomText(
+                                                          controller.chosenCountry?.name??"",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(width: 10,),
+                                                    controller.chosenCountry == null?const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,):const Icon(Icons.check,color: kSuccessColor,),
+                                                  ],
+                                                )
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                controller.chosenCountry == null?const SizedBox():
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 10,),
+
+
+                                     Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
                                         child: CustomText(
                                           textAlign: TextAlign.center,
                                           maxLines: 3,
                                           "${
                                               Get.find<StorageService>().activeLocale ==
                                                   SupportedLocales.english
-                                                  ? "county"
-                                                  : "الدوله"
+                                                  ? "city"
+                                                  : "المدينه"
                                           } : ",
                                           style: TextStyle(
                                             shadows: <Shadow>[
@@ -238,7 +407,7 @@ class AdvancedSearchScreen extends StatelessWidget {
                                                   color: Colors.black
                                                       .withValues(alpha:0.5)),
                                             ],
-                                            fontSize: 13,
+                                            fontSize: 15,
                                             letterSpacing: 0,
                                             fontFamily:
                                             Get.find<StorageService>()
@@ -250,155 +419,625 @@ class AdvancedSearchScreen extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 10,),
 
-                                      Center(
-                                        child: InkWell(
-                                            onTap: (){
-                                               controller.choosingCountryCode(context);
-                                        },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              width:Get.width*0.9,
-                                              height:Get.height*0.06,
+                                    const SizedBox(height: 10,),
 
-                                              decoration: BoxDecoration(
+                                    InkWell(
+                                      onTap: (){
+                                        controller.choosingCities(context);
+                                      },
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            width:Get.width*0.9,
+                                            height:Get.height*0.06,
 
+                                            decoration: BoxDecoration(
+
+                                                borderRadius: BorderRadius.circular(50),
+                                                border: Border.all(color: kDarkGreenColor,width: 2)
+
+                                            ),
+                                            child:Padding(
+                                              padding: const EdgeInsets.all(5.0),
+                                              child: Container(
+
+                                                decoration: BoxDecoration(
+                                                  color: kDarkBlueColor,
                                                   borderRadius: BorderRadius.circular(50),
-                                                  border: Border.all(color: kDarkGreenColor,width: 2)
-
-                                              ),
-                                              child:Padding(
-                                                padding: const EdgeInsets.all(5.0),
-                                                child: Container(
-
-                                                  decoration: BoxDecoration(
-                                                    color: kDarkBlueColor,
-                                                    borderRadius: BorderRadius.circular(50),
-                                                  ),
-                                                  child:
-                                                  Center(child:
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                    children: [
-                                                      controller.chosenCountry == null?CustomText(
-                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose county":"أختر الدوله",
-                                                        style:  TextStyle(
-                                                          fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                          color: kWhiteColor,
-                                                          fontSize: 15,
-                                                          height: 1,
-                                                          letterSpacing: -1,
-                                                        ),
-                                                      ):Row(
-                                                        children: [
-                                                          CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose county:":"الدوله المختاره:",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 20,
-                                                          ),
-                                                          CachedNetworkImage(
-                                                            imageUrl:"${Services.baseEndPoint}${controller.chosenCountry?.flag}",
-                                                            imageBuilder: ((context, image) {
-                                                              return Container(
-                                                                  height: Get.height * 0.04,
-                                                                  width: Get.width * 0.07,
-
-                                                                  decoration: BoxDecoration(
-                                                                    borderRadius: BorderRadius.circular(10),
-
-                                                                    image: DecorationImage(
-                                                                      image: image,
-                                                                      fit: BoxFit.fitWidth,
-                                                                    ),
-                                                                  ));
-                                                            }),
-                                                            placeholder: (context, image) {
-                                                              return Padding(
-                                                                padding: const EdgeInsets.all(5),
-                                                                child: Container(
-                                                                    decoration: const BoxDecoration(
-                                                                        borderRadius:
-                                                                        BorderRadius.all(
-                                                                            Radius.circular(
-                                                                                15))),
-                                                                    child:const CircularProgressIndicator(
-                                                                      color: kDarkGreenColor,
-                                                                    )),
-                                                              );
-                                                            },
-                                                            errorWidget: (context, url, error) {
-                                                              return Container(
-                                                                  height: Get.height * 0.04,
-                                                                  width: Get.width * 0.07,
-
-                                                                  decoration: const BoxDecoration(
-
-                                                                      image: DecorationImage(
-                                                                        image: AssetImage(
-                                                                            "assets/images/27002.jpg"),
-                                                                        fit: BoxFit.fitHeight,
-                                                                      ),
-                                                                      borderRadius:
-                                                                      BorderRadius.all(
-                                                                          Radius.circular(
-                                                                              10))));
-                                                            },
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 5,
-                                                          ),
-                                                          CustomText(
-                                                            controller.chosenCountry?.name??"",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                        ],
+                                                ),
+                                                child:
+                                                Center(child:
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  children: [
+                                                    controller.chosenCity == null?CustomText(
+                                                      Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose city":"إختر المدينه",
+                                                      style:  TextStyle(
+                                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                        color: kWhiteColor,
+                                                        fontSize: 15,
+                                                        height: 1,
+                                                        letterSpacing: -1,
                                                       ),
-                                                      const SizedBox(width: 10,),
-                                                      const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,),
-                                                    ],
-                                                  )
-                                                  ),
+                                                    ):Row(
+                                                      children: [
+                                                        CustomText(
+                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"chosen city:":"المدينه المختاره:",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 20,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        CustomText(
+                                                          controller.chosenCity?.name??"",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(width: 10,),
+                                                    controller.chosenCity == null?const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,):const Icon(Icons.check,color: kSuccessColor,),
+                                                  ],
+                                                )
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  controller.chosenCountry == null?const SizedBox():
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 10,),
+                                    ),
+                                  ],
+                                ),
+                                controller.chosenCity == null?const SizedBox():
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 10,),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                      child: CustomText(
+                                        textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        "${
+                                            Get.find<StorageService>().activeLocale ==
+                                                SupportedLocales.english
+                                                ? "car brand"
+                                                : "ماركة السيارة"
+                                        } : ",
+                                        style: TextStyle(
+                                          shadows: <Shadow>[
+                                            Shadow(
+                                                offset:
+                                                const Offset(0.5, 0.5),
+                                                blurRadius: 0.5,
+                                                color: Colors.black
+                                                    .withValues(alpha:0.5)),
+                                          ],
+                                          fontSize: 15,
+                                          letterSpacing: 0,
+                                          fontFamily:
+                                          Get.find<StorageService>()
+                                              .activeLocale ==
+                                              SupportedLocales.english
+                                              ? fontFamilyEnglishName
+                                              : fontFamilyArabicName,
+                                          color: kDarkGreenColor,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10,),
 
+                                    InkWell(
+                                        onTap: (){
+                                          controller.choosingCarBrands(context);
+                                        },
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            width:Get.width*0.9,
+                                            height:Get.height*0.06,
 
-                                       Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                            decoration: BoxDecoration(
+
+                                                borderRadius: BorderRadius.circular(50),
+                                                border: Border.all(color: kDarkGreenColor,width: 2)
+
+                                            ),
+                                            child:Padding(
+                                              padding: const EdgeInsets.all(5.0),
+                                              child: Container(
+
+                                                decoration: BoxDecoration(
+                                                  color: kDarkBlueColor,
+                                                  borderRadius: BorderRadius.circular(50),
+                                                ),
+                                                child:
+                                                Center(child:
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  children: [
+                                                    controller.chosenCarBrand == null?CustomText(
+                                                      Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose car brand":"إختر ماركة السيارة",
+                                                      style:  TextStyle(
+                                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                        color: kWhiteColor,
+                                                        fontSize: 15,
+                                                        height: 1,
+                                                        letterSpacing: -1,
+                                                      ),
+                                                    ):Row(
+                                                      children: [
+                                                        CustomText(
+                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"chosen car brand:":"ماركة السيارة المختاره:",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 20,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        CustomText(
+                                                          controller.chosenCarBrand?.name??"",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(width: 10,),
+                                                    controller.chosenCarBrand == null?const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,):const Icon(Icons.check,color: kSuccessColor,),
+                                                  ],
+                                                )
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                controller.chosenCarBrand == null?const SizedBox():
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 10,),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal:15.0),
+                                      child: CustomText(
+                                        textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        "${
+                                            Get.find<StorageService>().activeLocale ==
+                                                SupportedLocales.english
+                                                ? "car moadel"
+                                                : "طراز السيارة"
+                                        } : ",
+                                        style: TextStyle(
+                                          shadows: <Shadow>[
+                                            Shadow(
+                                                offset:
+                                                const Offset(0.5, 0.5),
+                                                blurRadius: 0.5,
+                                                color: Colors.black
+                                                    .withValues(alpha:0.5)),
+                                          ],
+                                          fontSize: 15,
+                                          letterSpacing: 0,
+                                          fontFamily:
+                                          Get.find<StorageService>()
+                                              .activeLocale ==
+                                              SupportedLocales.english
+                                              ? fontFamilyEnglishName
+                                              : fontFamilyArabicName,
+                                          color: kDarkGreenColor,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10,),
+
+                                    InkWell(
+                                        onTap:(){
+                                        controller.choosingCarModels(context);
+                                        },
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            width:Get.width*0.9,
+                                            height:Get.height*0.06,
+
+                                            decoration: BoxDecoration(
+
+                                                borderRadius: BorderRadius.circular(50),
+                                                border: Border.all(color: kDarkGreenColor,width: 2)
+
+                                            ),
+                                            child:Padding(
+                                              padding: const EdgeInsets.all(5.0),
+                                              child: Container(
+
+                                                decoration: BoxDecoration(
+                                                  color: kDarkBlueColor,
+                                                  borderRadius: BorderRadius.circular(50),
+                                                ),
+                                                child:
+                                                Center(child:
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  children: [
+                                                    controller.chosenCarModel == null?CustomText(
+                                                      Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose car brand":"إختر طراز السيارة",
+                                                      style:  TextStyle(
+                                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                        color: kWhiteColor,
+                                                        fontSize: 15,
+                                                        height: 1,
+                                                        letterSpacing: -1,
+                                                      ),
+                                                    ):Row(
+                                                      children: [
+                                                        CustomText(
+                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"chosen car model:":"طراز السيارة المختاره:",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 20,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        CustomText(
+                                                          controller.chosenCarModel?.name??"",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(width: 10,),
+                                                    controller.chosenCarModel == null? const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,):const Icon(Icons.check,color: kSuccessColor,),
+                                                  ],
+                                                )
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                controller.chosenCarModel == null?const SizedBox():
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 10,),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                      child: CustomText(
+                                        textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        "${
+                                            Get.find<StorageService>().activeLocale ==
+                                                SupportedLocales.english
+                                                ? "Rental period"
+                                                : "فتره الأيجار"
+                                        } : ",
+                                        style: TextStyle(
+                                          shadows: <Shadow>[
+                                            Shadow(
+                                                offset:
+                                                const Offset(0.5, 0.5),
+                                                blurRadius: 0.5,
+                                                color: Colors.black
+                                                    .withValues(alpha:0.5)),
+                                          ],
+                                          fontSize: 15,
+                                          letterSpacing: 0,
+                                          fontFamily:
+                                          Get.find<StorageService>()
+                                              .activeLocale ==
+                                              SupportedLocales.english
+                                              ? fontFamilyEnglishName
+                                              : fontFamilyArabicName,
+                                          color: kDarkGreenColor,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10,),
+
+                                    Center(
+                                      child: InkWell(
+
+                                        onTap:(){
+                                          controller.choosingWithPeriods(context);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            width:Get.width*0.9,
+                                            height:Get.height*0.06,
+
+                                            decoration: BoxDecoration(
+
+                                                borderRadius: BorderRadius.circular(50),
+                                                border: Border.all(color: kDarkGreenColor,width: 2)
+
+                                            ),
+                                            child:Padding(
+                                              padding: const EdgeInsets.all(5.0),
+                                              child: Container(
+
+                                                decoration: BoxDecoration(
+                                                  color: kDarkBlueColor,
+                                                  borderRadius: BorderRadius.circular(50),
+                                                ),
+                                                child:
+                                                Center(child:
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  children: [
+                                                    controller.chosenPeriod.isEmpty ?CustomText(
+                                                      Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose Rental period":"إختر فتره الأيجار",
+                                                      style:  TextStyle(
+                                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                        color: kWhiteColor,
+                                                        fontSize: 15,
+                                                        height: 1,
+                                                        letterSpacing: -1,
+                                                      ),
+                                                    ):Row(
+                                                      children: [
+                                                        CustomText(
+                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"chosen Rental period:":"فتره الأيجار المختاره:",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 20,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        CustomText(
+                                                          controller.returnChosenPeriods(),
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(width: 10,),
+                                                    controller.chosenPeriod.isEmpty?const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,):const Icon(Icons.check,color: kSuccessColor,),
+                                                  ],
+                                                )
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                      ],
+                                ),
+                                controller.chosenPeriod.isEmpty?const SizedBox():
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 10,),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal:15.0),
+                                      child: CustomText(
+                                        textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        "${
+                                            Get.find<StorageService>().activeLocale ==
+                                                SupportedLocales.english
+                                                ? "driver"
+                                                : "السائق"
+                                        } : ",
+                                        style: TextStyle(
+                                          shadows: <Shadow>[
+                                            Shadow(
+                                                offset:
+                                                const Offset(0.5, 0.5),
+                                                blurRadius: 0.5,
+                                                color: Colors.black
+                                                    .withValues(alpha:0.5)),
+                                          ],
+                                          fontSize: 15,
+                                          letterSpacing: 0,
+                                          fontFamily:
+                                          Get.find<StorageService>()
+                                              .activeLocale ==
+                                              SupportedLocales.english
+                                              ? fontFamilyEnglishName
+                                              : fontFamilyArabicName,
+                                          color: kDarkGreenColor,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10,),
+
+                                    InkWell(
+
+                                      onTap:(){
+                                        controller.choosingWithDriverOrNot(context);
+                                      },
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            width:Get.width*0.9,
+                                            height:Get.height*0.06,
+
+                                            decoration: BoxDecoration(
+
+                                                borderRadius: BorderRadius.circular(50),
+                                                border: Border.all(color: kDarkGreenColor,width: 2)
+
+                                            ),
+                                            child:Padding(
+                                              padding: const EdgeInsets.all(5.0),
+                                              child: Container(
+
+                                                decoration: BoxDecoration(
+                                                  color: kDarkBlueColor,
+                                                  borderRadius: BorderRadius.circular(50),
+                                                ),
+                                                child:
+                                                Center(child:
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  children: [
+                                                    controller.chosenWithDriver.isEmpty?CustomText(
+                                                      Get.find<StorageService>().activeLocale == SupportedLocales.english?"Do you want a car with a driver?":"هل تريد السيارة بسائق؟",
+                                                      style:  TextStyle(
+                                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                        color: kWhiteColor,
+                                                        fontSize: 15,
+                                                        height: 1,
+                                                        letterSpacing: -1,
+                                                      ),
+                                                    ):Row(
+                                                      children: [
+                                                        CustomText(
+                                                          controller.returnChosenDriverOrNot(),
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+                                                        CustomText(
+                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?" , I want a car with a driver:":" , أريد السيارة بسائق",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ),
+
+                                                      ],
+                                                    ),
+                                                    const SizedBox(width: 10,),
+                                                    controller.chosenWithDriver.isEmpty?const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,):const Icon(Icons.check,color: kSuccessColor,),
+                                                  ],
+                                                )
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                controller.chosenWithDriver.isEmpty?const SizedBox():
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 10,),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                      child: CustomText(
+                                        textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        "${
+                                            Get.find<StorageService>().activeLocale ==
+                                                SupportedLocales.english
+                                                ? "History of car manufacturing"
+                                                : " تاريخ صناعه السيارة"
+                                        } : ",
+                                        style: TextStyle(
+                                          shadows: <Shadow>[
+                                            Shadow(
+                                                offset:
+                                                const Offset(0.5, 0.5),
+                                                blurRadius: 0.5,
+                                                color: Colors.black
+                                                    .withValues(alpha:0.5)),
+                                          ],
+                                          fontSize: 15,
+                                          letterSpacing: 0,
+                                          fontFamily:
+                                          Get.find<StorageService>()
+                                              .activeLocale ==
+                                              SupportedLocales.english
+                                              ? fontFamilyEnglishName
+                                              : fontFamilyArabicName,
+                                          color: kDarkGreenColor,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10,),
+
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 10,),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
                                           child: CustomText(
                                             textAlign: TextAlign.center,
                                             maxLines: 3,
                                             "${
                                                 Get.find<StorageService>().activeLocale ==
                                                     SupportedLocales.english
-                                                    ? "city"
-                                                    : "المدينه"
+                                                    ? "from"
+                                                    : "من"
                                             } : ",
                                             style: TextStyle(
                                               shadows: <Shadow>[
@@ -409,7 +1048,7 @@ class AdvancedSearchScreen extends StatelessWidget {
                                                     color: Colors.black
                                                         .withValues(alpha:0.5)),
                                               ],
-                                              fontSize: 13,
+                                              fontSize: 15,
                                               letterSpacing: 0,
                                               fontFamily:
                                               Get.find<StorageService>()
@@ -421,778 +1060,148 @@ class AdvancedSearchScreen extends StatelessWidget {
                                             ),
                                           ),
                                         ),
+                                        const SizedBox(height: 10,),
 
-                                      const SizedBox(height: 10,),
-
-                                      InkWell(
-                                        onTap: (){
-                                          controller.choosingCities(context);
-                                        },
-                                        child: Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              width:Get.width*0.9,
-                                              height:Get.height*0.06,
-
-                                              decoration: BoxDecoration(
-
-                                                  borderRadius: BorderRadius.circular(50),
-                                                  border: Border.all(color: kDarkGreenColor,width: 2)
-
-                                              ),
-                                              child:Padding(
-                                                padding: const EdgeInsets.all(5.0),
-                                                child: Container(
-
-                                                  decoration: BoxDecoration(
-                                                    color: kDarkBlueColor,
-                                                    borderRadius: BorderRadius.circular(50),
-                                                  ),
-                                                  child:
-                                                  Center(child:
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                    children: [
-                                                      controller.chosenCity == null?CustomText(
-                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose city":"إختر المدينه",
-                                                        style:  TextStyle(
-                                                          fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                          color: kWhiteColor,
-                                                          fontSize: 15,
-                                                          height: 1,
-                                                          letterSpacing: -1,
-                                                        ),
-                                                      ):Row(
-                                                        children: [
-                                                          CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?"chosen city:":"المدينه المختاره:",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 20,
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 5,
-                                                          ),
-                                                          CustomText(
-                                                            controller.chosenCity?.name??"",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      const SizedBox(width: 10,),
-                                                      const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,),
-                                                    ],
-                                                  )
-                                                  ),
-                                                ),
-                                              ),
+                                        Center(
+                                          child: PopupMenuButton<String>(
+                                            constraints: BoxConstraints(
+                                              maxWidth: Get.width * 0.8,
+                                              minWidth: Get.width * 0.8,
                                             ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  controller.chosenCity == null?const SizedBox():
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 10,),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                        child: CustomText(
-                                          textAlign: TextAlign.center,
-                                          maxLines: 3,
-                                          "${
-                                              Get.find<StorageService>().activeLocale ==
-                                                  SupportedLocales.english
-                                                  ? "car brand"
-                                                  : "ماركة السيارة"
-                                          } : ",
-                                          style: TextStyle(
-                                            shadows: <Shadow>[
-                                              Shadow(
-                                                  offset:
-                                                  const Offset(0.5, 0.5),
-                                                  blurRadius: 0.5,
-                                                  color: Colors.black
-                                                      .withValues(alpha:0.5)),
-                                            ],
-                                            fontSize: 13,
-                                            letterSpacing: 0,
-                                            fontFamily:
-                                            Get.find<StorageService>()
-                                                .activeLocale ==
-                                                SupportedLocales.english
-                                                ? fontFamilyEnglishName
-                                                : fontFamilyArabicName,
-                                            color: kDarkGreenColor,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10,),
-
-                                      InkWell(
-                                          onTap: (){
-                                            controller.choosingCarBrands(context);
-                                          },
-                                        child: Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              width:Get.width*0.9,
-                                              height:Get.height*0.06,
-                                        
-                                              decoration: BoxDecoration(
-                                        
-                                                  borderRadius: BorderRadius.circular(50),
-                                                  border: Border.all(color: kDarkGreenColor,width: 2)
-                                        
-                                              ),
-                                              child:Padding(
-                                                padding: const EdgeInsets.all(5.0),
-                                                child: Container(
-                                        
-                                                  decoration: BoxDecoration(
-                                                    color: kDarkBlueColor,
-                                                    borderRadius: BorderRadius.circular(50),
-                                                  ),
-                                                  child:
-                                                  Center(child:
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                    children: [
-                                                      controller.chosenCarBrand == null?CustomText(
-                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose car brand":"إختر ماركة السيارة",
-                                                        style:  TextStyle(
-                                                          fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                          color: kWhiteColor,
-                                                          fontSize: 15,
-                                                          height: 1,
-                                                          letterSpacing: -1,
-                                                        ),
-                                                      ):Row(
+                                            itemBuilder: (context) =>
+                                                controller.listOfYears!.map((e) {
+                                                  return PopupMenuItem(
+                                                    value: e.year,
+                                                    textStyle: TextStyle(
+                                                        color: kDarkGreenColor,
+                                                        fontFamily:
+                                                        Get.find<StorageService>().activeLocale ==
+                                                            SupportedLocales.english
+                                                            ? fontFamilyEnglishName
+                                                            : fontFamilyArabicName,
+                                                    ),
+                                                    onTap: () {
+                                                      controller.choosingYearFrom(e);
+                                                    },
+                                                    child: SizedBox(
+                                                      width: Get.width * 0.8,
+                                                      child: Column(
                                                         children: [
-                                                          CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?"chosen car brand:":"ماركة السيارة المختاره:",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 20,
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 5,
-                                                          ),
-                                                          CustomText(
-                                                            controller.chosenCarBrand?.name??"",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      const SizedBox(width: 10,),
-                                                      const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,),
-                                                    ],
-                                                  )
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  controller.chosenCarBrand == null?const SizedBox():
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 10,),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                        child: CustomText(
-                                          textAlign: TextAlign.center,
-                                          maxLines: 3,
-                                          "${
-                                              Get.find<StorageService>().activeLocale ==
-                                                  SupportedLocales.english
-                                                  ? "car moadel"
-                                                  : "طراز السيارة"
-                                          } : ",
-                                          style: TextStyle(
-                                            shadows: <Shadow>[
-                                              Shadow(
-                                                  offset:
-                                                  const Offset(0.5, 0.5),
-                                                  blurRadius: 0.5,
-                                                  color: Colors.black
-                                                      .withValues(alpha:0.5)),
-                                            ],
-                                            fontSize: 13,
-                                            letterSpacing: 0,
-                                            fontFamily:
-                                            Get.find<StorageService>()
-                                                .activeLocale ==
-                                                SupportedLocales.english
-                                                ? fontFamilyEnglishName
-                                                : fontFamilyArabicName,
-                                            color: kDarkGreenColor,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10,),
-
-                                      InkWell(
-                                          onTap:(){
-                                          controller.choosingCarModels(context);
-                                          },
-                                        child: Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              width:Get.width*0.9,
-                                              height:Get.height*0.06,
-
-                                              decoration: BoxDecoration(
-
-                                                  borderRadius: BorderRadius.circular(50),
-                                                  border: Border.all(color: kDarkGreenColor,width: 2)
-
-                                              ),
-                                              child:Padding(
-                                                padding: const EdgeInsets.all(5.0),
-                                                child: Container(
-
-                                                  decoration: BoxDecoration(
-                                                    color: kDarkBlueColor,
-                                                    borderRadius: BorderRadius.circular(50),
-                                                  ),
-                                                  child:
-                                                  Center(child:
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                    children: [
-                                                      controller.chosenCarBrand == null?CustomText(
-                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose car brand":"إختر طراز السيارة",
-                                                        style:  TextStyle(
-                                                          fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                          color: kWhiteColor,
-                                                          fontSize: 15,
-                                                          height: 1,
-                                                          letterSpacing: -1,
-                                                        ),
-                                                      ):Row(
-                                                        children: [
-                                                          CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?"chosen car model:":"طراز السيارة المختاره:",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 20,
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 5,
-                                                          ),
-                                                          CustomText(
-                                                            controller.chosenCarModel?.name??"",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      const SizedBox(width: 10,),
-                                                      const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,),
-                                                    ],
-                                                  )
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  controller.chosenCarModel == null?const SizedBox():
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 10,),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                        child: CustomText(
-                                          textAlign: TextAlign.center,
-                                          maxLines: 3,
-                                          "${
-                                              Get.find<StorageService>().activeLocale ==
-                                                  SupportedLocales.english
-                                                  ? "Rental period"
-                                                  : "فتره الأيجار"
-                                          } : ",
-                                          style: TextStyle(
-                                            shadows: <Shadow>[
-                                              Shadow(
-                                                  offset:
-                                                  const Offset(0.5, 0.5),
-                                                  blurRadius: 0.5,
-                                                  color: Colors.black
-                                                      .withValues(alpha:0.5)),
-                                            ],
-                                            fontSize: 13,
-                                            letterSpacing: 0,
-                                            fontFamily:
-                                            Get.find<StorageService>()
-                                                .activeLocale ==
-                                                SupportedLocales.english
-                                                ? fontFamilyEnglishName
-                                                : fontFamilyArabicName,
-                                            color: kDarkGreenColor,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10,),
-
-                                      Center(
-                                        child: InkWell(
-                                          
-                                          onTap:(){
-                                            controller.choosingWithPeriods(context);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              width:Get.width*0.9,
-                                              height:Get.height*0.06,
-                                          
-                                              decoration: BoxDecoration(
-                                          
-                                                  borderRadius: BorderRadius.circular(50),
-                                                  border: Border.all(color: kDarkGreenColor,width: 2)
-                                          
-                                              ),
-                                              child:Padding(
-                                                padding: const EdgeInsets.all(5.0),
-                                                child: Container(
-                                          
-                                                  decoration: BoxDecoration(
-                                                    color: kDarkBlueColor,
-                                                    borderRadius: BorderRadius.circular(50),
-                                                  ),
-                                                  child:
-                                                  Center(child:
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                    children: [
-                                                      controller.chosenPeriod.isEmpty ?CustomText(
-                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"choose Rental period":"إختر فتره الأيجار",
-                                                        style:  TextStyle(
-                                                          fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                          color: kWhiteColor,
-                                                          fontSize: 15,
-                                                          height: 1,
-                                                          letterSpacing: -1,
-                                                        ),
-                                                      ):Row(
-                                                        children: [
-                                                          CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?"chosen Rental period:":"فتره الأيجار المختاره:",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 20,
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 5,
-                                                          ),
-                                                          CustomText(
-                                                            controller.returnChosenPeriods(),
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      const SizedBox(width: 10,),
-                                                      const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,),
-                                                    ],
-                                                  )
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                        ],
-                                  ),
-                                  controller.chosenPeriod.isEmpty?const SizedBox():
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 10,),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                        child: CustomText(
-                                          textAlign: TextAlign.center,
-                                          maxLines: 3,
-                                          "${
-                                              Get.find<StorageService>().activeLocale ==
-                                                  SupportedLocales.english
-                                                  ? "driver"
-                                                  : "السائق"
-                                          } : ",
-                                          style: TextStyle(
-                                            shadows: <Shadow>[
-                                              Shadow(
-                                                  offset:
-                                                  const Offset(0.5, 0.5),
-                                                  blurRadius: 0.5,
-                                                  color: Colors.black
-                                                      .withValues(alpha:0.5)),
-                                            ],
-                                            fontSize: 13,
-                                            letterSpacing: 0,
-                                            fontFamily:
-                                            Get.find<StorageService>()
-                                                .activeLocale ==
-                                                SupportedLocales.english
-                                                ? fontFamilyEnglishName
-                                                : fontFamilyArabicName,
-                                            color: kDarkGreenColor,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10,),
-
-                                      InkWell(
-
-                                        onTap:(){
-                                          controller.choosingWithDriverOrNot(context);
-                                        },
-                                        child: Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              width:Get.width*0.9,
-                                              height:Get.height*0.06,
-                                        
-                                              decoration: BoxDecoration(
-                                        
-                                                  borderRadius: BorderRadius.circular(50),
-                                                  border: Border.all(color: kDarkGreenColor,width: 2)
-                                        
-                                              ),
-                                              child:Padding(
-                                                padding: const EdgeInsets.all(5.0),
-                                                child: Container(
-                                        
-                                                  decoration: BoxDecoration(
-                                                    color: kDarkBlueColor,
-                                                    borderRadius: BorderRadius.circular(50),
-                                                  ),
-                                                  child:
-                                                  Center(child:
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                    children: [
-                                                      controller.chosenWithDriver.isEmpty?CustomText(
-                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"Do you want a car with a driver?":"هل تريد السيارة بسائق؟",
-                                                        style:  TextStyle(
-                                                          fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                          color: kWhiteColor,
-                                                          fontSize: 15,
-                                                          height: 1,
-                                                          letterSpacing: -1,
-                                                        ),
-                                                      ):Row(
-                                                        children: [
-                                                          CustomText(
-                                                            controller.returnChosenDriverOrNot(),
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                          CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?" , I want a car with a driver:":" , أريد السيارة بسائق",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                        
-                                                        ],
-                                                      ),
-                                                      const SizedBox(width: 10,),
-                                                      const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,),
-                                                    ],
-                                                  )
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  controller.chosenWithDriver.isEmpty?const SizedBox():
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 10,),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                        child: CustomText(
-                                          textAlign: TextAlign.center,
-                                          maxLines: 3,
-                                          "${
-                                              Get.find<StorageService>().activeLocale ==
-                                                  SupportedLocales.english
-                                                  ? "History of car manufacturing"
-                                                  : " تاريخ صناعه السيارة"
-                                          } : ",
-                                          style: TextStyle(
-                                            shadows: <Shadow>[
-                                              Shadow(
-                                                  offset:
-                                                  const Offset(0.5, 0.5),
-                                                  blurRadius: 0.5,
-                                                  color: Colors.black
-                                                      .withValues(alpha:0.5)),
-                                            ],
-                                            fontSize: 13,
-                                            letterSpacing: 0,
-                                            fontFamily:
-                                            Get.find<StorageService>()
-                                                .activeLocale ==
-                                                SupportedLocales.english
-                                                ? fontFamilyEnglishName
-                                                : fontFamilyArabicName,
-                                            color: kDarkGreenColor,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10,),
-
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const SizedBox(height: 10,),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                            child: CustomText(
-                                              textAlign: TextAlign.center,
-                                              maxLines: 3,
-                                              "${
-                                                  Get.find<StorageService>().activeLocale ==
-                                                      SupportedLocales.english
-                                                      ? "from"
-                                                      : "من"
-                                              } : ",
-                                              style: TextStyle(
-                                                shadows: <Shadow>[
-                                                  Shadow(
-                                                      offset:
-                                                      const Offset(0.5, 0.5),
-                                                      blurRadius: 0.5,
-                                                      color: Colors.black
-                                                          .withValues(alpha:0.5)),
-                                                ],
-                                                fontSize: 13,
-                                                letterSpacing: 0,
-                                                fontFamily:
-                                                Get.find<StorageService>()
-                                                    .activeLocale ==
-                                                    SupportedLocales.english
-                                                    ? fontFamilyEnglishName
-                                                    : fontFamilyArabicName,
-                                                color: kDarkGreenColor,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 10,),
-
-                                          Center(
-                                            child: PopupMenuButton<String>(
-                                              constraints: BoxConstraints(
-                                                maxWidth: Get.width * 0.8,
-                                                minWidth: Get.width * 0.8,
-                                              ),
-                                              itemBuilder: (context) =>
-                                                  controller.listOfYears!.map((e) {
-                                                    return PopupMenuItem(
-                                                      value: e.year,
-                                                      textStyle: TextStyle(
-                                                          color: kDarkGreenColor,
-                                                          fontFamily:
-                                                          Get.find<StorageService>().activeLocale ==
-                                                              SupportedLocales.english
-                                                              ? fontFamilyEnglishName
-                                                              : fontFamilyArabicName,
-                                                      ),
-                                                      onTap: () {
-                                                        controller.choosingYearFrom(e);
-                                                      },
-                                                      child: SizedBox(
-                                                        width: Get.width * 0.8,
-                                                        child: Column(
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                              children: [
-                                                                Row(
-                                                                  children: [
-                                                                    Container(
-                                                                      width: 25,
-                                                                      height: 25,
-                                                                      decoration: BoxDecoration(
-                                                                          borderRadius: BorderRadius.circular(5),
-                                                                          color: Colors.white,
-                                                                          boxShadow: const [
-                                                                            BoxShadow(
-                                                                              color: kGreyColor,
-                                                                              blurRadius: 2,
-                                                                              offset:
-                                                                              Offset(1, 1), // Shadow position
-                                                                            ),
-                                                                          ],
-                                                                          border: Border.all(
-                                                                              color: kDarkGreenColor, width: 1)),
-                                                                      child: Center(
-                                                                        child: Icon(
-                                                                          Icons.check_box,
-                                                                          color: controller.chosenYearFrom==e
-                                                                              ? kDarkGreenColor
-                                                                              : Colors.white,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      width: 20,
-                                                                    ),
-
-                                                                    CustomText(
-                                                                      e?.year??"",
-                                                                      style:  TextStyle(
-                                                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                                        color: kWhiteColor,
-                                                                        fontSize: 15,
-                                                                        height: 1,
-                                                                        letterSpacing: -1,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            e == controller.listOfYears?.last
-                                                                ? const SizedBox()
-                                                                : const Divider(
-                                                              color: kDarkGreenColor,
-                                                              height: 1,
-                                                              thickness: 1,
-                                                              endIndent: 0,
-                                                              indent: 0,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                              color: kDarkBlueColor,
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: Container(
-                                                  width:Get.width*0.8,
-                                                  height:Get.height*0.06,
-
-                                                  decoration: BoxDecoration(
-
-                                                      borderRadius: BorderRadius.circular(50),
-                                                      border: Border.all(color: kDarkGreenColor,width: 2)
-
-                                                  ),
-                                                  child:Padding(
-                                                    padding: const EdgeInsets.all(5.0),
-                                                    child: Container(
-
-                                                      decoration: BoxDecoration(
-                                                        color: kDarkBlueColor,
-                                                        borderRadius: BorderRadius.circular(50),
-                                                      ),
-                                                      child:
-                                                      Center(child:
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                        children: [
-                                                          controller.chosenYearFrom == null?CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?"from year":"من سنه",
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 15,
-                                                              height: 1,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ):Row(
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                             children: [
-                                                              CustomText(
-                                                                Get.find<StorageService>().activeLocale == SupportedLocales.english?"from year":"من سنه",                                                              style:  TextStyle(
+                                                              Row(
+                                                                children: [
+                                                                  Container(
+                                                                    width: 25,
+                                                                    height: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.circular(5),
+                                                                        color: Colors.white,
+                                                                        boxShadow: const [
+                                                                          BoxShadow(
+                                                                            color: kGreyColor,
+                                                                            blurRadius: 2,
+                                                                            offset:
+                                                                            Offset(1, 1), // Shadow position
+                                                                          ),
+                                                                        ],
+                                                                        border: Border.all(
+                                                                            color: kDarkGreenColor, width: 1)),
+                                                                    child: Center(
+                                                                      child: Icon(
+                                                                        Icons.check_box,
+                                                                        color: controller.chosenYearFrom==e
+                                                                            ? kDarkGreenColor
+                                                                            : Colors.white,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 20,
+                                                                  ),
+
+                                                                  CustomText(
+                                                                    e?.year??"",
+                                                                    style:  TextStyle(
+                                                                      fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                                      color: kWhiteColor,
+                                                                      fontSize: 15,
+                                                                      height: 1,
+                                                                      letterSpacing: -1,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          e == controller.listOfYears?.last
+                                                              ? const SizedBox()
+                                                              : const Divider(
+                                                            color: kDarkGreenColor,
+                                                            height: 1,
+                                                            thickness: 1,
+                                                            endIndent: 0,
+                                                            indent: 0,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                            color: kDarkBlueColor,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Container(
+                                                width:Get.width*0.8,
+                                                height:Get.height*0.06,
+
+                                                decoration: BoxDecoration(
+
+                                                    borderRadius: BorderRadius.circular(50),
+                                                    border: Border.all(color: kDarkGreenColor,width: 2)
+
+                                                ),
+                                                child:Padding(
+                                                  padding: const EdgeInsets.all(5.0),
+                                                  child: Container(
+
+                                                    decoration: BoxDecoration(
+                                                      color: kDarkBlueColor,
+                                                      borderRadius: BorderRadius.circular(50),
+                                                    ),
+                                                    child:
+                                                    Center(child:
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                      children: [
+                                                        controller.chosenYearFrom == null?CustomText(
+                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"from year":"من سنه",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ):Row(
+                                                          children: [
+                                                            CustomText(
+                                                              Get.find<StorageService>().activeLocale == SupportedLocales.english?"from year":"من سنه",                                                              style:  TextStyle(
+                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                              color: kWhiteColor,
+                                                              fontSize: 15,
+                                                              height: 1,
+                                                              letterSpacing: -1,
+                                                            ),
+                                                          ),
+                                                            SizedBox(width: 5,),
+                                                            CustomText(
+                                                              controller.chosenYearFrom?.year??"",
+                                                              style:  TextStyle(
                                                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                                                 color: kWhiteColor,
                                                                 fontSize: 15,
@@ -1200,293 +1209,281 @@ class AdvancedSearchScreen extends StatelessWidget {
                                                                 letterSpacing: -1,
                                                               ),
                                                             ),
-                                                              SizedBox(width: 5,),
-                                                              CustomText(
-                                                                controller.chosenYearFrom?.year??"",
-                                                                style:  TextStyle(
-                                                                  fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                                  color: kWhiteColor,
-                                                                  fontSize: 15,
-                                                                  height: 1,
-                                                                  letterSpacing: -1,
-                                                                ),
-                                                              ),
 
 
-                                                            ],
-                                                          ),
-                                                          const SizedBox(width: 10,),
-                                                          const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,),
-                                                        ],
-                                                      )
-                                                      ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(width: 10,),
+                                                        controller.chosenYearFrom == null?const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,):const Icon(Icons.check,color: kSuccessColor,),
+                                                      ],
+                                                    )
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10,),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10,),
 
-                                      controller.chosenYearFrom == null?SizedBox():Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const SizedBox(height: 10,),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                            child: CustomText(
-                                              textAlign: TextAlign.center,
-                                              maxLines: 3,
-                                              "${
-                                                  Get.find<StorageService>().activeLocale ==
-                                                      SupportedLocales.english
-                                                      ? "to"
-                                                      : "الى"
-                                              } : ",
-                                              style: TextStyle(
-                                                shadows: <Shadow>[
-                                                  Shadow(
-                                                      offset:
-                                                      const Offset(0.5, 0.5),
-                                                      blurRadius: 0.5,
-                                                      color: Colors.black
-                                                          .withValues(alpha:0.5)),
-                                                ],
-                                                fontSize: 13,
-                                                letterSpacing: 0,
-                                                fontFamily:
-                                                Get.find<StorageService>()
-                                                    .activeLocale ==
+                                    controller.chosenYearFrom == null?SizedBox():Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 10,),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                          child: CustomText(
+                                            textAlign: TextAlign.center,
+                                            maxLines: 3,
+                                            "${
+                                                Get.find<StorageService>().activeLocale ==
                                                     SupportedLocales.english
-                                                    ? fontFamilyEnglishName
-                                                    : fontFamilyArabicName,
-                                                color: kDarkGreenColor,
-                                              ),
+                                                    ? "to"
+                                                    : "الى"
+                                            } : ",
+                                            style: TextStyle(
+                                              shadows: <Shadow>[
+                                                Shadow(
+                                                    offset:
+                                                    const Offset(0.5, 0.5),
+                                                    blurRadius: 0.5,
+                                                    color: Colors.black
+                                                        .withValues(alpha:0.5)),
+                                              ],
+                                              fontSize: 15,
+                                              letterSpacing: 0,
+                                              fontFamily:
+                                              Get.find<StorageService>()
+                                                  .activeLocale ==
+                                                  SupportedLocales.english
+                                                  ? fontFamilyEnglishName
+                                                  : fontFamilyArabicName,
+                                              color: kDarkGreenColor,
                                             ),
                                           ),
-                                          const SizedBox(height: 10,),
+                                        ),
+                                        const SizedBox(height: 10,),
 
-                                          Center(
-                                            child: PopupMenuButton<String>(
-                                              constraints: BoxConstraints(
-                                                maxWidth: Get.width * 0.8,
-                                                minWidth: Get.width * 0.8,
-                                              ),
-                                              itemBuilder: (context) =>
-                                                  controller.listOfYearsToChosen!.map((e) {
-                                                    return PopupMenuItem(
-                                                      value: e.year,
-                                                      textStyle: TextStyle(
-                                                          color: kWhiteColor,
-                                                          fontFamily:
-                                                          Get.find<StorageService>().activeLocale ==
-                                                              SupportedLocales.english
-                                                              ? fontFamilyEnglishName
-                                                              : fontFamilyArabicName,),
-                                                      onTap: () {
-                                                        controller.choosingYearTo(e);
-                                                      },
-                                                      child: SizedBox(
-                                                        width: Get.width * 0.8,
-                                                        child: Column(
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                              children: [
-                                                                Row(
-                                                                  children: [
-                                                                    Container(
-                                                                      width: 25,
-                                                                      height: 25,
-                                                                      decoration: BoxDecoration(
-                                                                          borderRadius: BorderRadius.circular(5),
-                                                                          color: Colors.white,
-                                                                          boxShadow: const [
-                                                                            BoxShadow(
-                                                                              color: kGreyColor,
-                                                                              blurRadius: 2,
-                                                                              offset:
-                                                                              Offset(1, 1), // Shadow position
-                                                                            ),
-                                                                          ],
-                                                                          border: Border.all(
-                                                                              color: kDarkGreenColor, width: 1)),
-                                                                      child: Center(
-                                                                        child: Icon(
-                                                                          Icons.check_box,
-                                                                          color: controller.chosenYearTo==e
-                                                                              ? kDarkGreenColor
-                                                                              : Colors.white,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      width: 20,
-                                                                    ),
-
-                                                                    CustomText(
-                                                                      e.year??"",
-                                                                      style:  TextStyle(
-                                                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                                        color: kWhiteColor,
-                                                                        fontSize: 15,
-                                                                        height: 1,
-                                                                        letterSpacing: -1,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            e == controller.listOfYears?.last
-                                                                ? const SizedBox()
-                                                                : const Divider(
-                                                              color: kDarkGreenColor,
-                                                              height: 1,
-                                                              thickness: 1,
-                                                              endIndent: 0,
-                                                              indent: 0,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                              color: kDarkBlueColor,
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: Container(
-                                                  width:Get.width*0.8,
-                                                  height:Get.height*0.06,
-
-                                                  decoration: BoxDecoration(
-
-                                                      borderRadius: BorderRadius.circular(50),
-                                                      border: Border.all(color: kDarkGreenColor,width: 2)
-
-                                                  ),
-                                                  child:Padding(
-                                                    padding: const EdgeInsets.all(5.0),
-                                                    child: Container(
-
-                                                      decoration: BoxDecoration(
-                                                        color: kDarkBlueColor,
-                                                        borderRadius: BorderRadius.circular(50),
-                                                      ),
-                                                      child:
-                                                      Center(child:
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        Center(
+                                          child: PopupMenuButton<String>(
+                                            constraints: BoxConstraints(
+                                              maxWidth: Get.width * 0.8,
+                                              minWidth: Get.width * 0.8,
+                                            ),
+                                            itemBuilder: (context) =>
+                                                controller.listOfYearsToChosen!.map((e) {
+                                                  return PopupMenuItem(
+                                                    value: e.year,
+                                                    textStyle: TextStyle(
+                                                        color: kWhiteColor,
+                                                        fontFamily:
+                                                        Get.find<StorageService>().activeLocale ==
+                                                            SupportedLocales.english
+                                                            ? fontFamilyEnglishName
+                                                            : fontFamilyArabicName,),
+                                                    onTap: () {
+                                                      controller.choosingYearTo(e);
+                                                    },
+                                                    child: SizedBox(
+                                                      width: Get.width * 0.8,
+                                                      child: Column(
                                                         children: [
-                                                          controller.chosenYearTo == null?CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?"to year":"الى سنه",
-                                                            style:  TextStyle(
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Row(
+                                                                children: [
+                                                                  Container(
+                                                                    width: 25,
+                                                                    height: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.circular(5),
+                                                                        color: Colors.white,
+                                                                        boxShadow: const [
+                                                                          BoxShadow(
+                                                                            color: kGreyColor,
+                                                                            blurRadius: 2,
+                                                                            offset:
+                                                                            Offset(1, 1), // Shadow position
+                                                                          ),
+                                                                        ],
+                                                                        border: Border.all(
+                                                                            color: kDarkGreenColor, width: 1)),
+                                                                    child: Center(
+                                                                      child: Icon(
+                                                                        Icons.check_box,
+                                                                        color: controller.chosenYearTo==e
+                                                                            ? kDarkGreenColor
+                                                                            : Colors.white,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 20,
+                                                                  ),
+
+                                                                  CustomText(
+                                                                    e.year??"",
+                                                                    style:  TextStyle(
+                                                                      fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                                      color: kWhiteColor,
+                                                                      fontSize: 15,
+                                                                      height: 1,
+                                                                      letterSpacing: -1,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          e == controller.listOfYears?.last
+                                                              ? const SizedBox()
+                                                              : const Divider(
+                                                            color: kDarkGreenColor,
+                                                            height: 1,
+                                                            thickness: 1,
+                                                            endIndent: 0,
+                                                            indent: 0,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                            color: kDarkBlueColor,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Container(
+                                                width:Get.width*0.8,
+                                                height:Get.height*0.06,
+
+                                                decoration: BoxDecoration(
+
+                                                    borderRadius: BorderRadius.circular(50),
+                                                    border: Border.all(color: kDarkGreenColor,width: 2)
+
+                                                ),
+                                                child:Padding(
+                                                  padding: const EdgeInsets.all(5.0),
+                                                  child: Container(
+
+                                                    decoration: BoxDecoration(
+                                                      color: kDarkBlueColor,
+                                                      borderRadius: BorderRadius.circular(50),
+                                                    ),
+                                                    child:
+                                                    Center(child:
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                      children: [
+                                                        controller.chosenYearTo == null?CustomText(
+                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"to year":"الى سنه",
+                                                          style:  TextStyle(
+                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                            color: kWhiteColor,
+                                                            fontSize: 15,
+                                                            height: 1,
+                                                            letterSpacing: -1,
+                                                          ),
+                                                        ):Row(
+                                                          children: [
+                                                            CustomText(
+                                                              Get.find<StorageService>().activeLocale == SupportedLocales.english?"to year":"الى سنه",                                                              style:  TextStyle(
                                                               fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                                               color: kWhiteColor,
                                                               fontSize: 15,
                                                               height: 1,
                                                               letterSpacing: -1,
                                                             ),
-                                                          ):Row(
-                                                            children: [
-                                                              CustomText(
-                                                                Get.find<StorageService>().activeLocale == SupportedLocales.english?"to year":"الى سنه",                                                              style:  TextStyle(
+                                                            ),
+                                                            const SizedBox(width: 5,),
+                                                            CustomText(
+                                                              controller.chosenYearTo?.year??"",
+                                                              style:  TextStyle(
                                                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                                                 color: kWhiteColor,
                                                                 fontSize: 15,
                                                                 height: 1,
                                                                 letterSpacing: -1,
                                                               ),
-                                                              ),
-                                                              const SizedBox(width: 5,),
-                                                              CustomText(
-                                                                controller.chosenYearTo?.year??"",
-                                                                style:  TextStyle(
-                                                                  fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                                  color: kWhiteColor,
-                                                                  fontSize: 15,
-                                                                  height: 1,
-                                                                  letterSpacing: -1,
-                                                                ),
-                                                              ),
+                                                            ),
 
 
-                                                            ],
-                                                          ),
-                                                          const SizedBox(width: 10,),
-                                                          const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,),
-                                                        ],
-                                                      )
-                                                      ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(width: 10,),
+                                                        controller.chosenYearTo == null?const Icon(Icons.arrow_drop_down_circle_outlined,color: kWhiteColor,):const Icon(Icons.check,color: kSuccessColor,),
+                                                      ],
+                                                    )
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
 
 
-                                ],
-                              ),
+                              ],
                             ),
                           ),
-                        ),
 
-                        controller.chosenYearTo == null?const SizedBox():Center(
-                          child: InkWell(
-                            onTap: (){
-                              controller.addingOrderForSpecialCar(context);
+                          controller.chosenYearTo == null?const SizedBox():Center(
+                            child: InkWell(
+                              onTap: (){
+                                controller.addingOrderForSpecialCar(context);
 
 
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                width:Get.width*0.8,
-                                height:Get.height*0.09,
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  width:Get.width*0.8,
+                                  height:Get.height*0.09,
 
-                                decoration: BoxDecoration(
+                                  decoration: BoxDecoration(
 
-                                    borderRadius: BorderRadius.circular(50),
-                                    border: Border.all(color: kDarkGreenColor,width: 2)
-
-                                ),
-                                child:Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Container(
-
-                                    decoration: BoxDecoration(
-                                      color: kDarkBlueColor,
                                       borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child:  Center(child: CustomText(
-                                      "أضف الطلب",
-                                      style:  TextStyle(
-                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                        color: kWhiteColor,
-                                        fontSize: 15,
-                                        height: 1,
-                                        letterSpacing: -1,
+                                      border: Border.all(color: kDarkGreenColor,width: 2)
+
+                                  ),
+                                  child:Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Container(
+
+                                      decoration: BoxDecoration(
+                                        color: kDarkBlueColor,
+                                        borderRadius: BorderRadius.circular(50),
                                       ),
-                                    )
+                                      child:  Center(child: CustomText(
+                                        "أضف الطلب",
+                                        style:  TextStyle(
+                                          fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                          color: kWhiteColor,
+                                          fontSize: 15,
+                                          height: 1,
+                                          letterSpacing: -1,
+                                        ),
+                                      )
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 10,),
-                      ],
+                          const SizedBox(height: 10,),
+                        ],
+                      ),
                     ),
                   ),
                 ),

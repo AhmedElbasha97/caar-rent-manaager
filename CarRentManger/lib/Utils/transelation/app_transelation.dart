@@ -127,8 +127,7 @@ class AppTranslations extends Translations {
       signUpTitlePass: "أدخل كلمة المرور جديده" ,
       signUpTitleConfirmPass: "تأكيد كلمة المرور" ,
       signUpBTN: "إنشاء حساب",
-      signUpText1: "هل لديك حساب بالفعل؟",
-      signUpText2: "تسجيل الدخول" ,
+
       goBack:"الرجوع",
       errorKey:"حدث خطأ",
       nameKey:"الاسم",

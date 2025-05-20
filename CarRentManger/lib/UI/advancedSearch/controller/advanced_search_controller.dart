@@ -13,6 +13,7 @@ import 'package:carrentmanger/models/country_code_model.dart';
 import 'package:carrentmanger/models/response_model.dart';
 import 'package:carrentmanger/models/years_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -63,6 +64,8 @@ class AdvancedSearchController extends GetxController{
   List<String> chosenWithDriver = [];
   bool isLoading = true;
   final BuildContext context;
+  final ScrollController scrollController = ScrollController();
+
   AdvancedSearchController(this.context);
   @override
   onInit() {
@@ -70,6 +73,22 @@ class AdvancedSearchController extends GetxController{
     getCountriesCodesList();
 
   }
+  @override
+  void dispose() {
+    scrollController.dispose(); // important!
+    super.dispose();
+  }
+  //scrollingDown
+  void _scrollToBottom() {
+    if (scrollController.hasClients) {
+      print(scrollController.position.userScrollDirection ==ScrollDirection.reverse );
+      scrollController.jumpTo(scrollController.position.extentTotal);
+
+    }
+
+
+  }
+
   //getting data from api
 getCountriesCodesList() async {
     listOfCountry = await AppInfoServices.getCountriesCodesList();
@@ -87,11 +106,15 @@ getCountriesCodesList() async {
  }
  getCarModelsList() async {
     listOfCarModels = await CarServices.getCarModelsList(chosenCarBrand!.id.toString());
+
     update();
  }
  getYearsList() async {
     listOfYears = await CarServices.getYearsList();
+
+
     update();
+    _scrollToBottom();
  }
 
  //choosingData
@@ -100,14 +123,17 @@ getCountriesCodesList() async {
    chosenCity = null;
    chosenCarBrand = null;
    chosenCarModel = null;
+
    Get.back();
    getCitiestList();
+   _scrollToBottom();
    update();
  }
  choosingCity(CategoryModel city){
    chosenCity = city;
    chosenCarBrand = null;
    getCarBrandsList();
+   _scrollToBottom();
    Get.back();
 
    update();
@@ -116,13 +142,16 @@ choosingCarBrand(CategoryModel carBrand){
     chosenCarBrand = carBrand;
     chosenCarModel = null;
     getCarModelsList();
+    _scrollToBottom();
     Get.back();
 
     update();
 }
 choosingCarModel(CategoryModel carModel) {
   chosenCarModel = carModel;
+  _scrollToBottom();
   Get.back();
+  _scrollToBottom();
 
   update();
 }
@@ -130,11 +159,14 @@ choosingYearFrom(YearsModel year){
   chosenYearFrom = year;
   filteringYears();
   update();
+  _scrollToBottom();
 }
 choosingYearTo(YearsModel year){
     chosenYearTo = year;
   update();
-  }
+    _scrollToBottom();
+
+}
 choosingPeriod(String period){
     if(chosenPeriod.contains(period)) {
       chosenPeriod.remove(period);
@@ -142,6 +174,8 @@ choosingPeriod(String period){
       chosenPeriod.add(period);
     }
     update();
+    _scrollToBottom();
+
 }
 choosingWithDriver(String withDriver) {
   if(chosenWithDriver.contains(withDriver)) {
@@ -151,6 +185,8 @@ choosingWithDriver(String withDriver) {
   }
   getYearsList();
   update();
+  _scrollToBottom();
+
 }
 
 //getting user location
@@ -1860,6 +1896,8 @@ choosingWithDriver(String withDriver) {
       }
     }
     return theChosenOfthePeriod;
+    _scrollToBottom();
+
   }
   // filtering years
   filteringYears(){
@@ -1883,6 +1921,8 @@ choosingWithDriver(String withDriver) {
       chosenYearTo = listOfYears?.last;
     }
 update();
+    _scrollToBottom();
+
   }
   List<String> gettingChosenDriver(){
     List<String> chosenDriver = [];

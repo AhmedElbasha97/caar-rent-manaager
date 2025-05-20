@@ -18,6 +18,7 @@ import 'package:carrentmanger/models/country_code_model.dart';
 import 'package:carrentmanger/models/response_model.dart';
 import 'package:carrentmanger/models/years_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -80,6 +81,8 @@ bool isSendingData =false;
   bool isLoading = true;
   final BuildContext context;
   AddingCarForRentController(this.context);
+  ScrollController scrollController = ScrollController();
+
   @override
   onInit() {
     super.onInit();
@@ -92,6 +95,17 @@ bool isSendingData =false;
     super.onClose();
     myFocusNode.dispose(); // Always dispose the FocusNode
     nameController.dispose();
+    scrollController.dispose(); // important!
+
+  }
+  void _scrollToBottom() {
+    if (scrollController.hasClients) {
+      print(scrollController.position.userScrollDirection ==ScrollDirection.reverse );
+      scrollController.jumpTo(scrollController.position.extentTotal);
+
+    }
+
+
   }
   //office neme validator
   void onNameUpdate(String? value) {
@@ -99,6 +113,7 @@ bool isSendingData =false;
       nameState = false;
     }
     update();
+
   }
 
 
@@ -147,6 +162,7 @@ bool isSendingData =false;
     Get.back();
     getCitiestList();
     update();
+    _scrollToBottom();
   }
   choosingCity(CategoryModel city){
     chosenCity = city;
@@ -157,6 +173,7 @@ bool isSendingData =false;
     Get.back();
 
     update();
+    _scrollToBottom();
   }
   choosingCarBrand(CategoryModel carBrand){
     chosenCarBrand = carBrand;
@@ -167,6 +184,8 @@ bool isSendingData =false;
     Get.back();
 
     update();
+
+    _scrollToBottom();
   }
   choosingCarModel(CategoryModel carModel) {
     chosenCarModel = carModel;
@@ -175,6 +194,7 @@ bool isSendingData =false;
     Get.back();
 
     update();
+    _scrollToBottom();
   }
   choosingPeriod(String period){
     if(chosenPeriod.contains(period)) {
@@ -186,6 +206,7 @@ bool isSendingData =false;
     myFocusNode.unfocus();
 
     update();
+    _scrollToBottom();
   }
   choosingWithDriver(String withDriver) {
     if(chosenWithDriver.contains(withDriver)) {
@@ -197,18 +218,22 @@ bool isSendingData =false;
 
     getYearsList();
     update();
+    _scrollToBottom();
   }
   choosingInsuranceType(String insuranceType) {
     chosenInsuranceType = insuranceType;
     myFocusNode.unfocus();
 
     update();
+    _scrollToBottom();
   }
 choosingYear(YearsModel year){
     chosenYear = year;
     myFocusNode.unfocus();
 
     update();
+
+    _scrollToBottom();
 }
   getPrevImages(){
     if(index > 0 ){
@@ -265,7 +290,7 @@ choosingYear(YearsModel year){
       update();
     }
     myFocusNode.unfocus();
-
+    _scrollToBottom();
   }
   editingImage() async {
     XFile? image = await _picker.pickImage(source: ImageSource.gallery);
