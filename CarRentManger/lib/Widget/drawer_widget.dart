@@ -36,7 +36,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   bool isLoadingSocialLink = true;
   late SocialLinkModel? socialLinkData;
   AppDepartmentModel? data;
-
+double drawerWidgetFont = Get.height <= 932? 16:20;
+double drawerWidgetHeight = Get.height <= 932? Get.height*0.06:Get.height*0.08;
   String userName = "";
   @override
   void initState() {
@@ -313,7 +314,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               style:  TextStyle(
                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                 color: kDarkGreenColor,
-                                fontSize: 16,
+                                fontSize: drawerWidgetFont,
                                 letterSpacing: 0,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -323,7 +324,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 width: Get.width*0.1,
-                                height: Get.height*0.06,
+                                height: drawerWidgetHeight,
 
                                 decoration: BoxDecoration(
 
@@ -366,7 +367,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               style:  TextStyle(
                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                 color: kDarkGreenColor,
-                                fontSize: 16,
+                                fontSize: drawerWidgetFont,
                                 letterSpacing: 0,
                                 fontWeight: FontWeight.w500,
                                             ),
@@ -376,7 +377,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 width: Get.width*0.1,
-                                height: Get.height*0.06,
+                                height: drawerWidgetHeight,
 
                                 decoration: BoxDecoration(
 
@@ -414,7 +415,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               width: Get.width*0.1,
                               height: Get.height*0.06,
                               child: const Center(child: CircularProgressIndicator())),
-                        ):(data?.carRentRequest??0) == 0?const SizedBox():InkWell(
+                        ):(data?.carRentRequest??0) == 0?const SizedBox():
+                        InkWell(
                           onTap: (){
                             Get.to(()=>const CarRequestListScreen(),transition: Get.find<StorageService>().activeLocale == SupportedLocales.english?Transition.rightToLeftWithFade:Transition.leftToRightWithFade);
                             widget.scaffoldKey.currentState?.openEndDrawer();
@@ -425,7 +427,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               style:  TextStyle(
                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                 color: kDarkGreenColor,
-                                fontSize: 16,
+                                fontSize: drawerWidgetFont,
                                 letterSpacing: 0,
                                 fontWeight: FontWeight.w500,
 
@@ -436,7 +438,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 width: Get.width*0.1,
-                                height: Get.height*0.06,
+                                height: drawerWidgetHeight,
 
                                 decoration: BoxDecoration(
 
@@ -472,7 +474,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
                               width: Get.width*0.1,
-                              height: Get.height*0.06,
+                              height: drawerWidgetHeight,
                               child: const Center(child: CircularProgressIndicator())),
                         ):(data?.addCars??0) == 0?const SizedBox():InkWell(
                           onTap: (){
@@ -485,7 +487,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               style:  TextStyle(
                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                 color: kDarkGreenColor,
-                                fontSize: 16,
+                                fontSize: drawerWidgetFont,
                                 letterSpacing: 0,
                                 fontWeight: FontWeight.w500,
 
@@ -496,7 +498,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 width: Get.width*0.1,
-                                height: Get.height*0.06,
+                                height: drawerWidgetHeight,
 
                                 decoration: BoxDecoration(
 
@@ -539,7 +541,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               style:  TextStyle(
                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                 color: kDarkGreenColor,
-                                fontSize: 16,
+                                fontSize: drawerWidgetFont,
                                 letterSpacing: 0,
                                 fontWeight: FontWeight.w500,
 
@@ -550,7 +552,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 width: Get.width*0.1,
-                                height: Get.height*0.06,
+                                height: drawerWidgetHeight,
 
                                 decoration: BoxDecoration(
 
@@ -593,7 +595,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               style:  TextStyle(
                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                 color: kDarkGreenColor,
-                                fontSize: 16,
+                                fontSize: drawerWidgetFont,
                                 letterSpacing: 0,
                                 fontWeight: FontWeight.w500,
 
@@ -604,7 +606,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 width: Get.width*0.1,
-                                height: Get.height*0.06,
+                                height: drawerWidgetHeight,
 
                                 decoration: BoxDecoration(
 
@@ -652,7 +654,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               style:  TextStyle(
                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                 color: kDarkGreenColor,
-                                fontSize: 16,
+                                fontSize: drawerWidgetFont,
                                 letterSpacing: 0,
                                 fontWeight: FontWeight.w500,
 
@@ -663,7 +665,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 width: Get.width*0.1,
-                                height: Get.height*0.06,
+                                height: drawerWidgetHeight,
 
                                 decoration: BoxDecoration(
 
@@ -706,7 +708,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               style:  TextStyle(
                                 fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                 color: kDarkGreenColor,
-                                fontSize: 16,
+                                fontSize: drawerWidgetFont,
                                 letterSpacing: 0,
                                 fontWeight: FontWeight.w500,
 
@@ -717,7 +719,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 width: Get.width*0.1,
-                                height: Get.height*0.06,
+                                height: drawerWidgetHeight,
 
                                 decoration: BoxDecoration(
 

@@ -202,16 +202,26 @@ choosingWithDriver(String withDriver) {
     List<Placemark> i =
     await placemarkFromCoordinates(lat, long);
     Placemark placeMark = i.first;
-
-    for(var countryCode in listOfCountry!){
-      if(placeMark.country == countryCode.name){
+    bool isFoundCountry = false;
+    for (var countryCode in listOfCountry!) {
+      if (placeMark.country == countryCode.name) {
         chosenCountry = countryCode;
         getCitiestList();
+        isFoundCountry = true;
         isLoading = false;
         update();
       }
     }
-
+    if (!isFoundCountry) {
+      for (var countryCode in listOfCountry!) {
+        if ("Qatar" == countryCode.name) {
+          chosenCountry = countryCode;
+          getCitiestList();
+          isLoading = false;
+          update();
+        }
+      }
+    }
   }
   //bottom modal sheet for countries
   choosingCountryCode(BuildContext context){
