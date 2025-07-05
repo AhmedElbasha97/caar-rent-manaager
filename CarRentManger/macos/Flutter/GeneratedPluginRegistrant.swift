@@ -5,6 +5,7 @@
 import FlutterMacOS
 import Foundation
 
+import app_settings
 import connectivity_plus
 import file_picker
 import file_selector_macos
@@ -17,6 +18,7 @@ import flutter_localization
 import geolocator_apple
 import in_app_review
 import local_auth_darwin
+import package_info_plus
 import path_provider_foundation
 import rive_common
 import share_plus
@@ -26,6 +28,7 @@ import url_launcher_macos
 import webview_flutter_wkwebview
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  AppSettingsPlugin.register(with: registry.registrar(forPlugin: "AppSettingsPlugin"))
   ConnectivityPlusPlugin.register(with: registry.registrar(forPlugin: "ConnectivityPlusPlugin"))
   FilePickerPlugin.register(with: registry.registrar(forPlugin: "FilePickerPlugin"))
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
@@ -38,6 +41,7 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   GeolocatorPlugin.register(with: registry.registrar(forPlugin: "GeolocatorPlugin"))
   InAppReviewPlugin.register(with: registry.registrar(forPlugin: "InAppReviewPlugin"))
   FLALocalAuthPlugin.register(with: registry.registrar(forPlugin: "FLALocalAuthPlugin"))
+  FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
   PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
   RivePlugin.register(with: registry.registrar(forPlugin: "RivePlugin"))
   SharePlusMacosPlugin.register(with: registry.registrar(forPlugin: "SharePlusMacosPlugin"))

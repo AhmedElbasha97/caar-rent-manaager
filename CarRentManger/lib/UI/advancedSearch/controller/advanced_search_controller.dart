@@ -18,6 +18,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:carrentmanger/models/category_model.dart';
+import 'package:permission_handler/permission_handler.dart' as AppSettings;
 
 import '../../../Utils/colors.dart';
 import '../../../Utils/constant.dart';
@@ -129,19 +130,19 @@ getCountriesCodesList() async {
    _scrollToBottom();
    update();
  }
- choosingCity(CategoryModel city){
+ choosingCity(CategoryModel city) async {
    chosenCity = city;
    chosenCarBrand = null;
-   getCarBrandsList();
+  await getCarBrandsList();
    _scrollToBottom();
    Get.back();
 
    update();
  }
-choosingCarBrand(CategoryModel carBrand){
+choosingCarBrand(CategoryModel carBrand) async {
     chosenCarBrand = carBrand;
     chosenCarModel = null;
-    getCarModelsList();
+   await getCarModelsList();
     _scrollToBottom();
     Get.back();
 
@@ -155,9 +156,9 @@ choosingCarModel(CategoryModel carModel) {
 
   update();
 }
-choosingYearFrom(YearsModel year){
+choosingYearFrom(YearsModel year) async {
   chosenYearFrom = year;
-  filteringYears();
+  await filteringYears();
   update();
   _scrollToBottom();
 }
@@ -177,26 +178,114 @@ choosingPeriod(String period){
     _scrollToBottom();
 
 }
-choosingWithDriver(String withDriver) {
+choosingWithDriver(String withDriver) async {
   if(chosenWithDriver.contains(withDriver)) {
     chosenWithDriver.remove(withDriver);
   }else{
     chosenWithDriver.add(withDriver);
   }
-  getYearsList();
+  await getYearsList();
   update();
   _scrollToBottom();
 
 }
 
 //getting user location
+  String tr(String ar, String en) {
+    return Get.find<StorageService>().activeLocale == SupportedLocales.english ? en : ar;
+  }
   void _getCurrentLocation() async {
+    bool serviceEnabled;
     LocationPermission permission;
-    permission = await Geolocator.requestPermission();
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showLocationServiceDialog(context);
+      return;
+    }
+
+    // Check location permission
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        _showPermissionDeniedDialog(context);
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      _showPermissionDeniedForeverDialog(context);
+      return;
+    }
+
+    // Permission granted, get location
     Position res = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     getAddressOfLocation(res.latitude, res.longitude);
+  }
+  void _showLocationServiceDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(tr("تشغيل الموقع", "Enable Location")),
+        content: Text(tr(
+          "خدمة الموقع غير مفعّلة. من فضلك فعّلها من الإعدادات.",
+          "Location services are disabled. Please enable them from settings.",
+        )),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Geolocator.openLocationSettings();
+            },
+            child: Text(tr("فتح الإعدادات", "Open Settings")),
+          ),
+        ],
+      ),
+    );
+  }
 
+  void _showPermissionDeniedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(tr("إذن الموقع مرفوض", "Location Permission Denied")),
+        content: Text(tr(
+          "نحتاج إذن الموقع لتشغيل هذه الميزة.",
+          "Location permission is required to use this feature.",
+        )),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(tr("حسناً", "OK")),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPermissionDeniedForeverDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(tr("إذن الموقع مرفوض دائمًا", "Permission Denied Forever")),
+        content: Text(tr(
+          "لقد قمت برفض إذن الموقع دائمًا. الرجاء السماح من إعدادات التطبيق.",
+          "You have permanently denied location permission. Please allow it from app settings.",
+        )),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              AppSettings.openAppSettings();
+            },
+            child: Text(tr("فتح إعدادات التطبيق", "Open App Settings")),
+          ),
+        ],
+      ),
+    );
   }
   getAddressOfLocation(double lat,double long) async {
     List<Placemark> i =
@@ -213,15 +302,11 @@ choosingWithDriver(String withDriver) {
       }
     }
     if (!isFoundCountry) {
-      for (var countryCode in listOfCountry!) {
-        if ("Qatar" == countryCode.name) {
-          chosenCountry = countryCode;
-          getCitiestList();
+
           isLoading = false;
           update();
         }
-      }
-    }
+
   }
   //bottom modal sheet for countries
   choosingCountryCode(BuildContext context){
@@ -1939,7 +2024,7 @@ update();
     for(String driver in chosenWithDriver){
       if(driver == "السيارة بسائق" || driver =="car with driver" ){
         chosenDriver.add("1");
-      }else if(driver == "لسيارة بدون سائق" || driver =="car without driver"){
+      }else if(driver == "السيارة بدون سائق" || driver =="car without driver"){
         chosenDriver.add("0");
       }
     }

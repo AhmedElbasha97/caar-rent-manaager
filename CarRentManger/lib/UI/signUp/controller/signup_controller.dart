@@ -1,3 +1,4 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carrentmanger/Services/app_info_services.dart';
@@ -55,7 +56,9 @@ class SignUpController extends GetxController {
   bool lastNameState = false;
   bool phoneState = false;
   bool signingUp = false;
-
+  bool isFoundCountry = false;
+  final BuildContext context;
+SignUpController(this.context);
   @override
   void onInit() {
     super.onInit();
@@ -170,20 +173,108 @@ class SignUpController extends GetxController {
     countriesCodesList = await AppInfoServices.getCountriesCodesList();
     _getCurrentLocation();
   }
+  String tr(String ar, String en) {
+    return Get.find<StorageService>().activeLocale == SupportedLocales.english ? en : ar;
+  }
   void _getCurrentLocation() async {
+    bool serviceEnabled;
     LocationPermission permission;
-    permission = await Geolocator.requestPermission();
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showLocationServiceDialog(context);
+      return;
+    }
+
+    // Check location permission
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        _showPermissionDeniedDialog(context);
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      _showPermissionDeniedForeverDialog(context);
+      return;
+    }
+
+    // Permission granted, get location
     Position res = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     getAddressOfLocation(res.latitude, res.longitude);
+  }
+  void _showLocationServiceDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(tr("تشغيل الموقع", "Enable Location")),
+        content: Text(tr(
+          "خدمة الموقع غير مفعّلة. من فضلك فعّلها من الإعدادات.",
+          "Location services are disabled. Please enable them from settings.",
+        )),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Geolocator.openLocationSettings();
+            },
+            child: Text(tr("فتح الإعدادات", "Open Settings")),
+          ),
+        ],
+      ),
+    );
+  }
 
+  void _showPermissionDeniedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(tr("إذن الموقع مرفوض", "Location Permission Denied")),
+        content: Text(tr(
+          "نحتاج إذن الموقع لتشغيل هذه الميزة.",
+          "Location permission is required to use this feature.",
+        )),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(tr("حسناً", "OK")),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPermissionDeniedForeverDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(tr("إذن الموقع مرفوض دائمًا", "Permission Denied Forever")),
+        content: Text(tr(
+          "لقد قمت برفض إذن الموقع دائمًا. الرجاء السماح من إعدادات التطبيق.",
+          "You have permanently denied location permission. Please allow it from app settings.",
+        )),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              AppSettings.openAppSettings();
+            },
+            child: Text(tr("فتح إعدادات التطبيق", "Open App Settings")),
+          ),
+        ],
+      ),
+    );
   }
   getAddressOfLocation(double lat,double long) async {
     List<Placemark> i =
     await placemarkFromCoordinates(lat, long);
     Placemark placeMark = i.first;
 
-    bool isFoundCountry = false;
+
     for(var countryCode in countriesCodesList!){
       if(placeMark.country == countryCode.name){
         selectedCountryCode = countryCode;
@@ -192,20 +283,15 @@ class SignUpController extends GetxController {
         update();
       }
     }
-    if(!isFoundCountry){
-      for(var countryCode in countriesCodesList!){
-        if("Qatar" == countryCode.name){
-          selectedCountryCode = countryCode;
-          isLoading = false;
-          update();
-        }
-      }
-    }
+
+
 
   }
 
   choosingAnotherCountryCode(CountryCodeModel chosenCountryCode,BuildContext context){
     selectedCountryCode = chosenCountryCode;
+    isFoundCountry = true;
+
     update();
     Navigator.pop(context);
   }

@@ -12,6 +12,8 @@ import 'package:carrentmanger/models/years_model.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
 
+import '../models/car_show _room_model.dart';
+
 class CarServices{
   static ApiService api = ApiService();
   static Future<List<CategoryModel>?>getCarBrandsList() async {
@@ -117,7 +119,7 @@ class CarServices{
     return null;
   }
 
-  static Future<ResponseModel?>addingCarToRent(String showRoomName,List<String>? withDriverOrNot,List<String>? thePeriodOfRenting,String chosenYearOfManfacture,String countryId,String cityId,String carBrandId,String carModelId,String insuranceType, List<File>? imagesFile) async {
+  static Future<ResponseModel?>addingCarToRent(String showRoomName,List<String>? withDriverOrNot,List<String>? thePeriodOfRenting,String chosenYearOfManfacture,String countryId,String cityId,String carBrandId,String carModelId,String insuranceType, List<File>? imagesFile,String latitude,String longitude) async {
     final formData = dio.FormData.fromMap({
       "mem_id":Get.find<StorageService>().getId,
       "country_id":countryId,
@@ -129,6 +131,8 @@ class CarServices{
       "driver[]":withDriverOrNot?.join('|'),
       "type[]":thePeriodOfRenting?.join('|'),
       "showroom_name":showRoomName,
+      "latitude":latitude,
+      "longitude":longitude,
     });
     for (int i = 0; i < (imagesFile?.length??0); i++) {
       String fileName = imagesFile?[i].path
@@ -143,6 +147,27 @@ class CarServices{
       );
     }
     var data = await api.request(Services.addingCarEndPoint, "POST",data: formData);
+    if (data != null) {
+      return ResponseModel.fromJson(data);
+    }
+    return null;
+  }
+  static Future<ResponseModel?>editingCarToRent(String showRoomName,String carId,List<String>? withDriverOrNot,List<String>? thePeriodOfRenting,String chosenYearOfManfacture,String countryId,String cityId,String carBrandId,String carModelId,String insuranceType,) async {
+
+    var data = await api.request(Services.editingCarEndPoint, "POST",queryParamters: {
+      "cm_id":carId,
+      "mem_id":Get.find<StorageService>().getId,
+      "country_id":countryId,
+      "city_id":cityId,
+      "inc_type": insuranceType,
+      "make_id":carBrandId,
+      "model_id":carModelId,
+      "car_year":chosenYearOfManfacture,
+      "driver[]":withDriverOrNot?.join('|'),
+      "type[]":thePeriodOfRenting?.join('|'),
+      "showroom_name":showRoomName,
+
+    });
     if (data != null) {
       return ResponseModel.fromJson(data);
     }
@@ -169,6 +194,15 @@ class CarServices{
     });
     if (data != null) {
       return ResponseModel.fromJson(data);
+    }
+    return null;
+  }
+  static Future<CarShowRoomModel?>gettingCarShowRoomModel() async {
+    var data = await api.request(Services.gettingCarShowRoomEndPoint, "POST",data: {
+      "mem_id":Get.find<StorageService>().getId,
+    });
+    if (data != null) {
+      return CarShowRoomModel.fromJson(data);
     }
     return null;
   }

@@ -14,18 +14,19 @@ import 'package:flutter_animate/flutter_animate.dart';
 class CarRentWidget extends StatelessWidget {
    CarRentWidget({super.key, required this.carData});
   final CarRentedModel? carData;
-  List<String>? listOfWithDriver = Get.find<StorageService>().activeLocale ==
-      SupportedLocales.english
-      ? ["Yes","No"]
-      :["نعم","لا"];
-  List<String>? listOfPeriods = Get.find<StorageService>().activeLocale ==
-      SupportedLocales.english
-      ? ["daily","weekly","monthly","until ownership"]
-      :["يومى","أسبوعى","شهرى"," حتى التملك"];
+
    List<String>? listInsuranceTypes = Get.find<StorageService>().activeLocale ==
        SupportedLocales.english
        ? ["Comprehensive Insurance","Third Party Insurance"]
        :["تأمين شامل","تأمين ضد الغير"];
+   List<String>? listOfWithDriver = Get.find<StorageService>().activeLocale ==
+       SupportedLocales.english
+       ? ["No","Yes"]
+       :["لا","نعم"];
+   List<String>? listOfPeriods = Get.find<StorageService>().activeLocale ==
+       SupportedLocales.english
+       ? ["daily","weekly","monthly","until ownership"]
+       :["يومى","أسبوعى","شهرى"," حتى التملك"];
    String returnChosenPeriods(){
      String theChosenOfthePeriod = "";
      for (int i = 0; i < (carData?.type?.length ?? 0); i++) {
@@ -33,7 +34,7 @@ class CarRentWidget extends StatelessWidget {
            .find<StorageService>()
            .activeLocale ==
            SupportedLocales.english
-           ? (listOfPeriods?[i]?? "") : (listOfPeriods?[i]?? "")}";
+           ? (listOfPeriods?[int.parse((carData?.type?[i].isNotEmpty??false)?(carData?.type?[i]??"0"):"0")-1]?? "") : (listOfPeriods?[int.parse((carData?.type?[i].isNotEmpty??false)?(carData?.type?[i]??"0"):"0")-1]?? "")}";
        if ((i + 1) < (carData?.type?.length ?? 0)) {
          theChosenOfthePeriod = "$theChosenOfthePeriod , ";
        }
@@ -47,7 +48,7 @@ class CarRentWidget extends StatelessWidget {
            .find<StorageService>()
            .activeLocale ==
            SupportedLocales.english
-           ? (listOfWithDriver?[i]?? "") : (listOfWithDriver?[i]?? "")}";
+           ? (listOfWithDriver?[int.parse((carData?.driver?[i].isNotEmpty??false)?(carData?.driver?[i]??"0"):"0")]?? "") : (listOfWithDriver?[int.parse((carData?.driver?[i].isNotEmpty??false)?(carData?.driver?[i]??"0"):"0")]?? "")}";
        if ((i + 1) < (carData?.driver?.length ?? 0 )) {
          theChosenOfWithDriverOrNot = "$theChosenOfWithDriverOrNot ${ Get
              .find<StorageService>()
@@ -148,18 +149,23 @@ class CarRentWidget extends StatelessWidget {
                                                 ),
 
                                               ),
-                                              CustomText(
-                                                carData?.make ?? "" ,
-                                                textAlign: TextAlign.center,
-                                                style:  TextStyle(
-                                                  fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                  color: kDarkBlueColor,
-                                                  fontSize: 15,
-                                                  letterSpacing: 0,
+                                                Container(
+                                                  width: Get.width*0.25,
+                                                  child: CustomText(
+                                                    carData?.make?.name ?? "" ,
+                                                    textAlign: TextAlign.right,
+                                                     maxLines:3,
+                                                  style:  TextStyle(
+                                                    fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                    color: kDarkBlueColor,
+                                                    fontSize: 15,
+                                                    letterSpacing: 0,
 
-                                                ),),
+                                                  ),),
+                                              ),
                                             ],
                                           ),
+                                          SizedBox(height: Get.height*0.005,),
                                           Row(
                                             children: [
                                               CustomText(
@@ -175,7 +181,7 @@ class CarRentWidget extends StatelessWidget {
 
                                               ),
                                               CustomText(
-                                                carData?.model ?? "" ,
+                                                carData?.model?.name ?? "" ,
                                                 textAlign: TextAlign.center,
                                                 style:  TextStyle(
                                                   fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
@@ -186,6 +192,7 @@ class CarRentWidget extends StatelessWidget {
                                                 ),),
                                             ],
                                           ),
+                                          SizedBox(height: Get.height*0.005,),
                                           Row(
                                             children: [
                                               CustomText(
@@ -212,6 +219,7 @@ class CarRentWidget extends StatelessWidget {
                                                 ),),
                                             ],
                                           ),
+                                          SizedBox(height: Get.height*0.005,),
                                           Row(
                                             children: [
                                               CustomText(
@@ -227,7 +235,7 @@ class CarRentWidget extends StatelessWidget {
 
                                               ),
                                               CustomText(
-                                                listInsuranceTypes?[carData?.status ?? 0]??"" ,
+                                                listInsuranceTypes?[(carData?.incType ?? 0)-1]??"" ,
                                                 textAlign: TextAlign.center,
                                                 style:  TextStyle(
                                                   fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
@@ -238,6 +246,7 @@ class CarRentWidget extends StatelessWidget {
                                                 ),),
                                             ],
                                           ),
+                                          SizedBox(height: Get.height*0.005,),
                                           Row(
                                             children: [
                                               CustomText(
@@ -252,18 +261,23 @@ class CarRentWidget extends StatelessWidget {
                                                 ),
 
                                               ),
-                                              CustomText(
-                                                returnChosenPeriods(),
-                                                textAlign: TextAlign.center,
-                                                style:  TextStyle(
-                                                  fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                  color: kDarkBlueColor,
-                                                  fontSize: 15,
-                                                  letterSpacing: 0,
+                                              Container(
+                                                width: Get.width*0.4,
+                                                child: CustomText(
+                                                  returnChosenPeriods(),
+                                                  textAlign: TextAlign.right,
+                                                  maxLines: 4,
+                                                  style:  TextStyle(
+                                                    fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                                    color: kDarkBlueColor,
+                                                    fontSize: 15,
+                                                    letterSpacing: 0,
 
-                                                ),),
+                                                  ),),
+                                              ),
                                             ],
                                           ),
+                                          SizedBox(height: Get.height*0.005,),
                                           Row(
                                             children: [
                                               CustomText(
@@ -424,7 +438,7 @@ class CarRentWidget extends StatelessWidget {
                                             borderRadius: BorderRadius.circular(20), // Image border
                                             child: SizedBox.fromSize(
                                               size: const Size.fromRadius(48), // Image radius
-                                              child: Container(color:kWhiteColor,decoration: BoxDecoration(
+                                              child: Container(decoration: BoxDecoration(color:kWhiteColor,
                                                 image: DecorationImage(
                                                 image: image,
                                                 fit:  BoxFit.fill,

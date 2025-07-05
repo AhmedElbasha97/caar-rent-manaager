@@ -30,7 +30,7 @@ class HomeController extends GetxController{
         .checkIfThereIsNotificationPage)&&(Get
         .find<StorageService>()
         .checkIfThereIsNotificationPageId)){
-      Get.to(  WebViewContainer("https://prog.carrentmanager.com/api/car_request_cars?mem_id=${Get.find<StorageService>().getId}&request_id=${Get
+      Get.to(  WebViewContainer("https://carrentmanager.com/app_login/${Get.find<StorageService>().getId}&request_id=${Get
           .find<StorageService>()
           .getNotificationPageId}"));
     }

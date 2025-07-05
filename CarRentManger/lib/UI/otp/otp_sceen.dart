@@ -7,6 +7,7 @@ import 'package:carrentmanger/Utils/translation_key.dart';
 import 'package:carrentmanger/Widget/custom_text_widget.dart';
 import 'package:carrentmanger/Widget/text_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../signIn/signin_screen.dart';
@@ -19,9 +20,17 @@ class OtpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<OTPController>(
       init: OTPController(comingFromSignUp),
-      builder: (controller) =>  SafeArea(
-        child: Scaffold(
-          body: Container(
+      builder: (controller) =>   AnnotatedRegion<SystemUiOverlayStyle>(
+    value: const SystemUiOverlayStyle(
+    statusBarColor: kDarkGreenColor, // نفس لون الخلفية
+    statusBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: kDarkGreenColor,
+    systemNavigationBarIconBrightness: Brightness.light,
+    ),
+    child: Scaffold(
+    backgroundColor: kDarkGreenColor,
+    body: SafeArea(
+    child: Container(
             width: Get.width,
             height: Get.height,
             decoration:  const BoxDecoration(
@@ -301,6 +310,7 @@ class OtpScreen extends StatelessWidget {
           ),
         ),
       ),
+    )
     );
   }
 }

@@ -35,7 +35,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.sync.carrentmanger"
     compileSdk flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -83,8 +83,10 @@ flutter {
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
     implementation 'com.google.firebase:firebase-messaging-ktx'
-    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.20"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.20"
+    implementation 'com.google.android.material:material:1.12.0'
+
 }
 apply plugin: 'com.google.gms.google-services'

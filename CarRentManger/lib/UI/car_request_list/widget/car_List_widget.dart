@@ -18,8 +18,8 @@ class CarListWidget extends StatelessWidget {
   final CarRequestModel? carData;
   List<String>? listOfWithDriver = Get.find<StorageService>().activeLocale ==
       SupportedLocales.english
-      ? ["Yes","No"]
-      :["نعم","لا"];
+      ? ["No","Yes"]
+      :["لا","نعم"];
   List<String>? listOfPeriods = Get.find<StorageService>().activeLocale ==
       SupportedLocales.english
       ? ["daily","weekly","monthly","until ownership"]
@@ -31,7 +31,7 @@ class CarListWidget extends StatelessWidget {
            .find<StorageService>()
            .activeLocale ==
            SupportedLocales.english
-           ? (listOfPeriods?[i]?? "") : (listOfPeriods?[i]?? "")}";
+           ? (listOfPeriods?[int.parse((carData?.type?[i].isNotEmpty??false)?(carData?.type?[i]??"0"):"0")-1]?? "") : (listOfPeriods?[int.parse((carData?.type?[i].isNotEmpty??false)?(carData?.type?[i]??"0"):"0")-1]?? "")}";
        if ((i + 1) < (carData?.type?.length ?? 0)) {
          theChosenOfthePeriod = "$theChosenOfthePeriod , ";
        }
@@ -45,7 +45,7 @@ class CarListWidget extends StatelessWidget {
            .find<StorageService>()
            .activeLocale ==
            SupportedLocales.english
-           ? (listOfWithDriver?[i]?? "") : (listOfWithDriver?[i]?? "")}";
+           ? (listOfWithDriver?[int.parse((carData?.driver?[i].isNotEmpty??false)?(carData?.driver?[i]??"0"):"0")]?? "") : (listOfWithDriver?[int.parse((carData?.driver?[i].isNotEmpty??false)?(carData?.driver?[i]??"0"):"0")]?? "")}";
        if ((i + 1) < (carData?.driver?.length ?? 0 )) {
          theChosenOfWithDriverOrNot = "$theChosenOfWithDriverOrNot ${ Get
              .find<StorageService>()

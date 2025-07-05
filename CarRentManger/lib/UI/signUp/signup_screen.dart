@@ -6,6 +6,7 @@ import 'package:carrentmanger/UI/terms_and_condition/terms_and_condition_screen.
 import 'package:carrentmanger/Utils/services.dart';
 import 'package:carrentmanger/Utils/translation_key.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../Utils/colors.dart';
@@ -23,10 +24,18 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<SignUpController>(
-      init: SignUpController(),
-      builder: (controller) =>  SafeArea(
-        child: Scaffold(
-          body: Container(
+      init: SignUpController(context),
+            builder: (controller) =>  AnnotatedRegion<SystemUiOverlayStyle>(
+          value: const SystemUiOverlayStyle(
+          statusBarColor: kDarkGreenColor, // نفس لون الخلفية
+          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: kDarkGreenColor,
+          systemNavigationBarIconBrightness: Brightness.light,
+          ),
+           child: Scaffold(
+           backgroundColor: kDarkGreenColor,
+           body: SafeArea(
+           child: Container(
             width: Get.width,
             height: Get.height,
             decoration:  const BoxDecoration(
@@ -270,7 +279,7 @@ class SignUpScreen extends StatelessWidget {
                               onTap: (){
                                 controller. choosingCountryCode( context);
                               },
-                              child: Row(
+                              child: (controller.isFoundCountry)?Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   CachedNetworkImage(
@@ -349,13 +358,40 @@ class SignUpScreen extends StatelessWidget {
                                     width: 5,
                                   ),
                                 ],
+                              ):Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.warning_amber,color: kDarkBlueColor,),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+
+                                  CustomText(
+                                    "choose",
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontFamily: Get.find<
+                                          StorageService>()
+                                          .activeLocale ==
+                                          SupportedLocales
+                                              .english
+                                          ? fontFamilyEnglishName
+                                          : fontFamilyArabicName,
+                                      color: kDarkGreenColor,
+                                    ),
+                                  ),
+
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                ],
                               ),
                             )
                                 :  InkWell(
                               onTap: (){
                                 controller. choosingCountryCode( context);
                               },
-                              child: Row(
+                              child:(controller.isFoundCountry)? Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   CachedNetworkImage(
@@ -424,6 +460,33 @@ class SignUpScreen extends StatelessWidget {
                                           : fontFamilyArabicName,
                                       color: kDarkGreenColor,
                                     ),
+                                  ),
+                                ],
+                              ):Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.warning_amber,color: kDarkBlueColor,),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+
+                                  CustomText(
+                                    "choose",
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontFamily: Get.find<
+                                          StorageService>()
+                                          .activeLocale ==
+                                          SupportedLocales
+                                              .english
+                                          ? fontFamilyEnglishName
+                                          : fontFamilyArabicName,
+                                      color: kDarkGreenColor,
+                                    ),
+                                  ),
+
+                                  const SizedBox(
+                                    width: 5,
                                   ),
                                 ],
                               ),
@@ -635,6 +698,7 @@ class SignUpScreen extends StatelessWidget {
           ),
         ),
       ),
+    )
     );
   }
 }

@@ -19,9 +19,11 @@ class Services {
  static String pausingRentingCarEndPoint = "car_member_end";//Post
  static String getProfileDataEndPoint = "member_info";//Post
  static String addingCarEndPoint = "car_member";//Post
+ static String editingCarEndPoint = "car_member_edit";//Post
  static String activatingAccountEndPoint = "signup2";//Post
  static String deletingAccountEndPoint = "member_delete";//Post
  static String getTermsAndConditionsEndPoint = "terms";//Post
  static String getPrivacyPolicyEndPoint = "policy";//Post
  static String resendNewOTPEndPoint = "send_otp";//Post
+ static String gettingCarShowRoomEndPoint = "car_member_showroom_name";//Post
 }

@@ -1,8 +1,6 @@
-// ignore_for_file: avoid_print
 
 import 'dart:io';
 import 'dart:ui';
-import 'dart:typed_data';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -18,21 +16,22 @@ import 'package:carrentmanger/Widget/text_field_widget.dart';
 import 'package:carrentmanger/models/country_code_model.dart';
 import 'package:carrentmanger/models/response_model.dart';
 import 'package:carrentmanger/models/years_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:carrentmanger/models/category_model.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart' as AppSettings;
 import '../../../Utils/localization_services.dart';
 import '../../../Utils/memory.dart';
-import '../../../models/car_show _room_model.dart';
-import '../../map/widget/location_pin.dart';
+import '../../../models/car_rented_model.dart';
 
-class AddingCarForRentController extends GetxController{
+class EditingCarRentRequestController extends GetxController{
+  final CarRentedModel? carData;
+
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
   late List<CountryCodeModel>? listOfCountry;
   List<CountryCodeModel>? listOfSearchedCountry = [];
@@ -57,23 +56,11 @@ class AddingCarForRentController extends GetxController{
   int index = 0;
   List<YearsModel>? listOfYears ;
   YearsModel? chosenYear;
-bool isSendingData =false;
-  final ImagePicker _picker = ImagePicker();
-  late List<File> imagesFile = [];
-  List<XFile>? images;
+  bool isSendingData =false;
+
   late TextEditingController nameController;
   bool nameValidated = false;
   bool nameState = false;
-  LatLng positionFromMap = const LatLng(0.0, 0.0);
-  var address = "".obs;
-  var countryCode = "".obs;
-  bool mapIsLoading = true;
-  late GoogleMapController mapController;
-
-  final googleApikey = "AIzaSyD04ljszRU7P1ImArt4MPcobozVR258FXY"; // ضع مفتاحك هنا
-  LatLng? positionOfTheCar;
-  int _markerIdCounter = 1;
-  String previousMarkerId = "";
   final _validatorHelber = ValidatorHelper.instance;
   FocusNode myFocusNode = FocusNode(); // Create a FocusNode
 
@@ -95,15 +82,61 @@ bool isSendingData =false;
   List<String> chosenWithDriver = [];
   bool isLoading = true;
   final BuildContext context;
-  AddingCarForRentController(this.context);
+  EditingCarRentRequestController(this.context, this.carData);
   ScrollController scrollController = ScrollController();
-  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+
   @override
   onInit() {
     super.onInit();
     getCountriesCodesList();
     nameController =TextEditingController();
+    fillingData();
+  }
+  fillingData() async {
+    nameController.text = carData?.showroomName??"";
+    await getYearsList();
+    await getCountriesCodesList();
+    chosenCountry = CountryCodeModel(id: carData?.country?.id??0,name: carData?.country?.name??"");
+    await getCitiestList();
+    chosenCity = CategoryModel(id: carData?.city?.id??0,name: carData?.city?.name??"");
+    await getCarBrandsList();
+    chosenCarBrand = CategoryModel(id: carData?.make?.id??0,name: carData?.make?.name??"");
+    await getCarModelsList();
+    chosenCarModel = CategoryModel(id: carData?.model?.id??0,name: carData?.model?.name??"");
+    ((carData?.incType??0) == 1)? chosenInsuranceType= (listInsuranceTypes?[0]??""): chosenInsuranceType= (listInsuranceTypes?[1]??"");
+    for(String driver in carData?.driver??[]){
+      if(driver == "1" ){
+        chosenWithDriver.add(listOfWithDriver?[0]??"");
+      }else  if(driver == "0" ){
+        chosenWithDriver.add(listOfWithDriver?[1]??"");
+      }
+    }
+    for(String period in carData?.type??[]){
+      if(period == "1"){
+        chosenPeriod.add(listOfPeriods?[0]??"");
+      }else  if(period == "2"){
+        chosenPeriod.add(listOfPeriods?[1]??"");
+      }else  if(period == "3"){
+        chosenPeriod.add(listOfPeriods?[2]??"");
+      }else  if(period == "4"){
+        chosenPeriod.add(listOfPeriods?[3]??"");
+      }
+    }
 
+
+
+
+
+    for(var i=0;i<listOfYears!.length;i++){
+      if(listOfYears![i].year == carData?.year){
+        chosenYear = listOfYears![i];
+        break;
+      }
+    }
+
+    isLoading = false;
+
+    update();
   }
   @override
   void onClose() {
@@ -113,7 +146,7 @@ bool isSendingData =false;
     scrollController.dispose(); // important!
 
   }
-  void scrollToBottom() {
+  void _scrollToBottom() {
     if (scrollController.hasClients) {
       print(scrollController.position.userScrollDirection ==ScrollDirection.reverse );
       scrollController.jumpTo(scrollController.position.extentTotal);
@@ -121,12 +154,6 @@ bool isSendingData =false;
     }
 
 
-  }
-  //choosing location of the car
-  choosingLocationOfTheCar(LatLng? pos){
-    positionOfTheCar = pos;
-    _createMarker();
-    update();
   }
   //office neme validator
   void onNameUpdate(String? value) {
@@ -138,37 +165,6 @@ bool isSendingData =false;
   }
 
 
-
-  _createMarker() {
-    add(positionOfTheCar?.latitude??0.0, positionOfTheCar?.longitude??0.0);
-
-  }
-
-  add(double lat, double lang) async {
-    final String markerIdVal = 'marker_id_$_markerIdCounter';
-    previousMarkerId = markerIdVal;
-    _markerIdCounter++;
-    await getAddress(positionOfTheCar?.latitude??0.0, positionOfTheCar?.longitude??0.0);
-    Uint8List? icon = await MarkersWithLabel.getBytesFromCanvasDynamic(
-        iconPath: 'assets/images/location_pin2.png', plateReg:Get.locale?.languageCode == 'en' ? "my car":"سياراتى", fontSize: 35, iconSize:  const Size(120,145));
-    final MarkerId markerId = MarkerId(markerIdVal);
-    final Marker marker = Marker(
-      icon: BitmapDescriptor.fromBytes(icon!),
-      markerId: markerId,
-      position: LatLng(lat, lang),
-    );
-    positionOfTheCar = LatLng(lat, lang);
-
-    markers[markerId] = marker;
-    mapIsLoading = false;
-    update();
-  }
-  Future<void> getAddress(double lat, double lng) async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-    Placemark placeMark = placemarks.first;
-    countryCode.value = placeMark.isoCountryCode ?? "";
-    address.value = "${placeMark.street}, ${placeMark.subAdministrativeArea}, ${placeMark.subLocality}, ${placeMark.country}";
-  }
   String? validateName(String? name) {
     var validateName = _validatorHelber.validateName(name);
     if (validateName == null && name != "") {
@@ -184,10 +180,6 @@ bool isSendingData =false;
   //getting data from api
   getCountriesCodesList() async {
     listOfCountry = await AppInfoServices.getCountriesCodesList();
-    CarShowRoomModel? carShowRoomName = await CarServices.gettingCarShowRoomModel();
-    if(carShowRoomName?.name!=null){
-      nameController.text = carShowRoomName?.name??"";
-    }
     _getCurrentLocation();
 
   }
@@ -218,7 +210,7 @@ bool isSendingData =false;
     Get.back();
     await getCitiestList();
     update();
-    scrollToBottom();
+    _scrollToBottom();
   }
   choosingCity(CategoryModel city) async {
     chosenCity = city;
@@ -229,7 +221,7 @@ bool isSendingData =false;
     Get.back();
 
     update();
-    scrollToBottom();
+    _scrollToBottom();
   }
   choosingCarBrand(CategoryModel carBrand) async {
     chosenCarBrand = carBrand;
@@ -241,7 +233,7 @@ bool isSendingData =false;
 
     update();
 
-    scrollToBottom();
+    _scrollToBottom();
   }
   choosingCarModel(CategoryModel carModel) {
     chosenCarModel = carModel;
@@ -250,7 +242,7 @@ bool isSendingData =false;
     Get.back();
 
     update();
-    scrollToBottom();
+    _scrollToBottom();
   }
   choosingPeriod(String period){
     if(chosenPeriod.contains(period)) {
@@ -262,7 +254,7 @@ bool isSendingData =false;
     myFocusNode.unfocus();
 
     update();
-    scrollToBottom();
+    _scrollToBottom();
   }
   choosingWithDriver(String withDriver) async {
     if(chosenWithDriver.contains(withDriver)) {
@@ -272,94 +264,26 @@ bool isSendingData =false;
     }
     myFocusNode.unfocus();
 
-   await getYearsList();
+    await getYearsList();
     update();
-    scrollToBottom();
+    _scrollToBottom();
   }
   choosingInsuranceType(String insuranceType) {
     chosenInsuranceType = insuranceType;
     myFocusNode.unfocus();
 
     update();
-    scrollToBottom();
+    _scrollToBottom();
   }
-choosingYear(YearsModel year){
+  choosingYear(YearsModel year){
     chosenYear = year;
     myFocusNode.unfocus();
 
     update();
 
-    scrollToBottom();
-}
-  getPrevImages(){
-    if(index > 0 ){
-      index = index-1;
-      update();
-    }else{
-      index = imagesFile.length-1;
-      update();
+    _scrollToBottom();
+  }
 
-    }
-  }
-  getNextImages(){
-    if(index < (imagesFile.length-1) ){
-      index = index+1;
-      update();
-    }else{
-      index = 0;
-      update();
-
-    }
-  }
-  Future<void> getImages(BuildContext context)  async {
-    images = await _picker.pickMultiImage();
-    update();
-    if (images != null) {
-      if(images!.length >= 7) {
-        images = [];
-        final snackBar = SnackBar(content:
-        Row(children: [
-          const Icon(Icons.close, color: Colors.white,),
-          const SizedBox(width: 10,),
-          Text(Get
-              .find<StorageService>()
-              .activeLocale ==
-              SupportedLocales.english
-              ? 'An error occurred while sending the message'
-              : 'لا يمكن أختيار أكثر من 6 صوره', style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-          ),
-          ),
-        ],),
-            backgroundColor: Colors.red
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      }else{
-        imagesFile = [];
-        for (XFile image in images!
-        ) {
-          imagesFile.add(File(image.path));
-        }
-      }
-      update();
-    }
-    myFocusNode.unfocus();
-    scrollToBottom();
-  }
-  editingImage() async {
-    XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    imagesFile[index] = File(image?.path??"");
-    update();
-  }
-  deleteImage(){
-    imagesFile.removeAt(index);
-    if(index!=0) {
-      index = index - 1;
-    }
-    update();
-  }
 //getting user location
   String tr(String ar, String en) {
     return Get.find<StorageService>().activeLocale == SupportedLocales.english ? en : ar;
@@ -466,14 +390,11 @@ choosingYear(YearsModel year){
         chosenCountry = countryCode;
         getCitiestList();
         isFoundCountry = true;
-        isLoading = false;
-        update();
+
       }
     }
     if (!isFoundCountry) {
 
-      isLoading = false;
-      update();
     }
   }
 
@@ -489,9 +410,9 @@ choosingYear(YearsModel year){
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       builder: (BuildContext context) {
-        return GetBuilder<AddingCarForRentController>(
-            init: AddingCarForRentController(context),
-            builder: (AddingCarForRentController controller) {
+        return GetBuilder<EditingCarRentRequestController>(
+            init: EditingCarRentRequestController(context,carData),
+            builder: (EditingCarRentRequestController controller) {
 
               return Container(
                 height: Get.height*0.8,
@@ -893,9 +814,9 @@ choosingYear(YearsModel year){
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       builder: (BuildContext context) {
-        return GetBuilder<AddingCarForRentController>(
-            init: AddingCarForRentController(context),
-            builder: (AddingCarForRentController controller) {
+        return GetBuilder<EditingCarRentRequestController>(
+            init: EditingCarRentRequestController(context,carData),
+            builder: (EditingCarRentRequestController controller) {
 
               return Container(
                 height: Get.height*0.8,
@@ -1201,9 +1122,9 @@ choosingYear(YearsModel year){
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       builder: (BuildContext context) {
-        return GetBuilder<AddingCarForRentController>(
-            init: AddingCarForRentController(context),
-            builder: (AddingCarForRentController controller) {
+        return GetBuilder<EditingCarRentRequestController>(
+            init: EditingCarRentRequestController(context,carData),
+            builder: (EditingCarRentRequestController controller) {
 
               return Container(
                 height: Get.height*0.8,
@@ -1509,9 +1430,9 @@ choosingYear(YearsModel year){
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       builder: (BuildContext context) {
-        return GetBuilder<AddingCarForRentController>(
-            init: AddingCarForRentController(context),
-            builder: (AddingCarForRentController controller) {
+        return GetBuilder<EditingCarRentRequestController>(
+            init: EditingCarRentRequestController(context,carData),
+            builder: (EditingCarRentRequestController controller) {
 
               return Container(
                 height: Get.height*0.8,
@@ -1816,9 +1737,9 @@ choosingYear(YearsModel year){
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       builder: (BuildContext context) {
-        return GetBuilder<AddingCarForRentController>(
-            init: AddingCarForRentController(context),
-            builder: (AddingCarForRentController controller) {
+        return GetBuilder<EditingCarRentRequestController>(
+            init: EditingCarRentRequestController(context,carData),
+            builder: (EditingCarRentRequestController controller) {
 
               return Container(
                 height: Get.height*0.8,
@@ -1994,9 +1915,9 @@ choosingYear(YearsModel year){
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       builder: (BuildContext context) {
-        return GetBuilder<AddingCarForRentController>(
-            init: AddingCarForRentController(context),
-            builder: (AddingCarForRentController controller) {
+        return GetBuilder<EditingCarRentRequestController>(
+            init: EditingCarRentRequestController(context,carData),
+            builder: (EditingCarRentRequestController controller) {
 
               return Container(
                 height: Get.height*0.8,
@@ -2094,49 +2015,49 @@ choosingYear(YearsModel year){
                           }).toList(),
                         ),
                         SizedBox(height: 10,),
-                Center(
-                  child: InkWell(
-                    onTap: (){
-                      Navigator.pop(context);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        width:Get.width*0.8,
-                        height:Get.height*0.09,
+                        Center(
+                          child: InkWell(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                width:Get.width*0.8,
+                                height:Get.height*0.09,
 
-                        decoration: BoxDecoration(
+                                decoration: BoxDecoration(
 
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border.all(color: kDarkGreenColor,width: 2)
+                                    borderRadius: BorderRadius.circular(50),
+                                    border: Border.all(color: kDarkGreenColor,width: 2)
 
-                        ),
-                        child:Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Container(
+                                ),
+                                child:Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Container(
 
-                            decoration: BoxDecoration(
-                              color: kDarkBlueColor,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child:  Center(child: CustomText(
-                              Get.find<StorageService>().activeLocale == SupportedLocales.english?"Apply":"تطبيق",
-                              style:  TextStyle(
-                                fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                color: kWhiteColor,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 15,
-                                height: 1,
-                                letterSpacing: -1,
+                                    decoration: BoxDecoration(
+                                      color: kDarkBlueColor,
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                    child:  Center(child: CustomText(
+                                      Get.find<StorageService>().activeLocale == SupportedLocales.english?"Apply":"تطبيق",
+                                      style:  TextStyle(
+                                        fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
+                                        color: kWhiteColor,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 15,
+                                        height: 1,
+                                        letterSpacing: -1,
+                                      ),
+                                    )
+                                    ),
+                                  ),
+                                ),
                               ),
-                            )
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
+                        )
                       ],
                     ),
                   ),
@@ -2187,7 +2108,64 @@ choosingYear(YearsModel year){
     }
     return chosenPeriods;
   }
-  addingCarToRent(BuildContext context) async {
+  checkerIfTheDataChangedOrNot(){
+    print(((nameController.text??"") == (carData?.showroomName??"")));
+    print(gettingChosenDriver());
+    print(carData?.driver??[]);
+    print(gettingChosenPeriods());
+    print(carData?.type??[]);
+
+    print( (gettingChosenDriver() == (carData?.driver!)));
+    print( (gettingChosenPeriods() == (carData?.type!)));
+    print( ((chosenYear?.year??"") == (carData?.year??"")));
+    print( ((chosenCountry?.id.toString()??"") == (carData?.country?.id.toString()??"")));
+    print( ((chosenCity?.id.toString()??"") == (carData?.city?.id.toString()??"")));
+    print(  ((chosenCarBrand?.id.toString()??"") == (carData?.make?.id.toString()??"")));
+    print( ((chosenCarModel?.id.toString()??"") == (carData?.model?.id.toString()??"")));
+    print( (((chosenInsuranceType == "تأمين شامل" ||
+            chosenInsuranceType == "Comprehensive Insurance") ? (carData?.incType == 1) :  (carData?.incType == 2))));
+    if(((nameController.text??"") == (carData?.showroomName??""))&&
+        listEquals(gettingChosenDriver(), carData?.driver) &&
+        listEquals(gettingChosenPeriods(), carData?.type) &&
+        ((chosenYear?.year??"") == (carData?.year??""))&&
+        ((chosenCountry?.id.toString()??"") == (carData?.country?.id.toString()??""))&&
+        ((chosenCity?.id.toString()??"") == (carData?.city?.id.toString()??""))&&
+        ((chosenCarBrand?.id.toString()??"") == (carData?.make?.id.toString()??""))&&
+        ((chosenCarModel?.id.toString()??"") == (carData?.model?.id.toString()??""))&&
+        (((chosenInsuranceType == "تأمين شامل" ||
+            chosenInsuranceType == "Comprehensive Insurance") ? (carData?.incType == 1) :  (carData?.incType == 2)))){
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.info,
+        animType: AnimType.rightSlide,
+        title: Get
+            .find<StorageService>()
+            .activeLocale ==
+            SupportedLocales.english
+            ? "please wait ...":"انتظر من فضلك ...",
+        desc: Get
+            .find<StorageService>()
+            .activeLocale ==
+            SupportedLocales.english
+            ?"You have not changed any data for your added car.":"أنك لم تقوم بتغير اى بينات للسيارتك المضافه",
+
+        btnCancelText: Get
+            .find<StorageService>()
+            .activeLocale == SupportedLocales.english
+            ?"no":"لا",
+        btnOkText: Get
+            .find<StorageService>()
+            .activeLocale == SupportedLocales.english
+            ?"yes":"نعم",
+        btnCancelOnPress: () {},
+        btnOkOnPress: () {},
+      ).show();
+      return  false;
+    }else{
+      return  true;
+    }
+  }
+ editingCarToRent(BuildContext context) async {
     if(isSendingData){
       AwesomeDialog(
         context: context,
@@ -2202,30 +2180,7 @@ choosingYear(YearsModel year){
             .find<StorageService>()
             .activeLocale ==
             SupportedLocales.english
-            ? "we are sending the data of your car":"نحن نرسل بيانات سيارتك",
-
-        btnCancelText: Get
-            .find<StorageService>()
-            .activeLocale == SupportedLocales.english
-            ?"no":"لا",
-        btnOkText: Get
-            .find<StorageService>()
-            .activeLocale == SupportedLocales.english
-            ?"yes":"نعم",
-        btnCancelOnPress: () {},
-        btnOkOnPress: () {},
-      ).show();
-    }else if(imagesFile.isEmpty){
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.error,
-        animType: AnimType.rightSlide,
-        title: errorKey.tr,
-        desc: Get
-            .find<StorageService>()
-            .activeLocale ==
-            SupportedLocales.english
-            ? "you must add images to your car":"يجب عليك إضافة صور لسيارتك",
+            ? "We modify your car data":"نحن نقوم بتعديل بيانات سيارتك",
 
         btnCancelText: Get
             .find<StorageService>()
@@ -2239,77 +2194,78 @@ choosingYear(YearsModel year){
         btnOkOnPress: () {},
       ).show();
     }else{
-      isSendingData = true;
-      update();
-
-      ResponseModel? data = await CarServices.addingCarToRent(
-        nameController.text??"",
-        gettingChosenDriver(),
-        gettingChosenPeriods(),
-        chosenYear?.year??"",
-        chosenCountry!.id.toString(),
-        chosenCity!.id.toString(),
-        chosenCarBrand!.id.toString(),
-        chosenCarModel!.id.toString(),
-        (chosenInsuranceType == "تأمين شامل" ||
-            chosenInsuranceType == "Comprehensive Insurance") ? '1' : '2',
-        imagesFile,
-        positionOfTheCar?.latitude.toString()??"",
-        positionOfTheCar?.longitude.toString()??"",
-
-      );
-
-      print(data?.msg);
-      if (data?.msg == "succeeded") {
-        isSendingData = false;
-      update();
-        final snackBar = SnackBar(content:
-        Row(children: [
-          const Icon(Icons.check, color: Colors.white,),
-          const SizedBox(width: 10,),
-          Text(Get
-              .find<StorageService>()
-              .activeLocale ==
-              SupportedLocales.english
-              ? 'The car has been added to rent'
-              : 'تم أضافه السيارة للإيجار ', style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-          ),
-          ),
-        ],),
-            backgroundColor: Colors.green
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-
-        Get.back();
-      }
-      else {
-        isSendingData = false;
+      if(checkerIfTheDataChangedOrNot()) {
+        isSendingData = true;
         update();
-        final snackBar = SnackBar(content:
-        Row(children: [
-          const Icon(Icons.close, color: Colors.white,),
-          const SizedBox(width: 10,),
-          Text(Get
-              .find<StorageService>()
-              .activeLocale ==
-              SupportedLocales.english
-              ? 'An error occurred while Adding the car to rent'
-              : 'حدث خطأ أثناء إضافة السيارة للإيجار', style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-          ),
-          ),
-        ],),
-            backgroundColor: Colors.red
+
+        ResponseModel? data = await CarServices.editingCarToRent(
+
+          nameController.text ?? "",
+          carData?.id.toString() ?? "",
+          gettingChosenDriver(),
+          gettingChosenPeriods(),
+          chosenYear?.year ?? "",
+          chosenCountry!.id.toString(),
+          chosenCity!.id.toString(),
+          chosenCarBrand!.id.toString(),
+          chosenCarModel!.id.toString(),
+          (chosenInsuranceType == "تأمين شامل" ||
+              chosenInsuranceType == "Comprehensive Insurance") ? '1' : '2',
         );
 
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        print(data?.msg);
+        if (data?.msg == "succeeded") {
+          isSendingData = false;
+          update();
+          final snackBar = SnackBar(content:
+          Row(children: [
+            const Icon(Icons.check, color: Colors.white,),
+            const SizedBox(width: 10,),
+            Text(Get
+                .find<StorageService>()
+                .activeLocale ==
+                SupportedLocales.english
+                ? 'Your car rental data has been modified.'
+                : 'تم تعديل بيانات سيارتك للإيجار ', style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold
+            ),
+            ),
+          ],),
+              backgroundColor: Colors.green
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+
+          Get.back();
+        }
+        else {
+          isSendingData = false;
+          update();
+          final snackBar = SnackBar(content:
+          Row(children: [
+            const Icon(Icons.close, color: Colors.white,),
+            const SizedBox(width: 10,),
+            Text(Get
+                .find<StorageService>()
+                .activeLocale ==
+                SupportedLocales.english
+                ? 'An error occurred while Adding the car to rent'
+                : 'حدث خطأ أثناء تعديل بيانات السيارة للإيجار',
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold
+              ),
+            ),
+          ],),
+              backgroundColor: Colors.red
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
       }
     }
-   }
+  }
 
 }

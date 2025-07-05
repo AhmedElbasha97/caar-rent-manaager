@@ -1,29 +1,29 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carrentmanger/UI/aadding_car_for_rent/controller/adding_car_for_rent_controller.dart';
-import 'package:carrentmanger/UI/aadding_car_for_rent/widget/image_show_widget.dart';
-import 'package:carrentmanger/UI/map/map_screen.dart';
-import 'package:carrentmanger/Utils/colors.dart';
-import 'package:carrentmanger/Utils/constant.dart';
-import 'package:carrentmanger/Utils/localization_services.dart';
-import 'package:carrentmanger/Utils/memory.dart';
-import 'package:carrentmanger/Utils/services.dart';
-import 'package:carrentmanger/Widget/custom_text_widget.dart';
-import 'package:carrentmanger/Widget/drawer_widget.dart';
-import 'package:carrentmanger/Widget/loader.dart';
-import 'package:carrentmanger/Widget/text_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class AddingCarForRentScreen extends StatelessWidget {
-  const AddingCarForRentScreen({super.key});
+import '../../Utils/colors.dart';
+import '../../Utils/constant.dart';
+import '../../Utils/localization_services.dart';
+import '../../Utils/memory.dart';
+import '../../Utils/services.dart';
+import '../../Widget/custom_text_widget.dart';
+import '../../Widget/drawer_widget.dart';
+import '../../Widget/loader.dart';
+import '../../Widget/text_field_widget.dart';
+import '../../models/car_rented_model.dart';
+import 'controller/editing_car_rent_request_controller.dart';
+
+class EditingCarRentRequestScreen extends StatelessWidget {
+  const EditingCarRentRequestScreen({super.key, this.carData});
+  final CarRentedModel? carData;
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder(
-      init:  AddingCarForRentController(context),
-      builder: (AddingCarForRentController controller) =>  AnnotatedRegion<SystemUiOverlayStyle>(
+      init:  EditingCarRentRequestController(context,carData),
+      builder: (EditingCarRentRequestController controller) =>  AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
           statusBarColor: kDarkGreenColor, // نفس لون الخلفية
           statusBarIconBrightness: Brightness.light,
@@ -50,7 +50,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                       color: kWhiteColor,
                       child: Container(
                         width: Get.width,
-            
+
                         decoration:  const BoxDecoration(
                             color: kDarkGreenColor,
                             borderRadius: BorderRadius.only(
@@ -78,7 +78,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             color: kDarkGreenColor,
                                             child: Container(
                                               width: Get.width*0.2,
-            
+
                                               decoration:  BoxDecoration(
                                                   color: kWhiteColor,
                                                   borderRadius: Get.find<StorageService>().activeLocale == SupportedLocales.english?const BorderRadius.only(
@@ -115,7 +115,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets.all(8.0),
-            
+
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
@@ -123,8 +123,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                     children: [
                                                       // Implement the stroke
                                                       CustomText(
-                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"Adding Car For Rent":"إضافة سيارة للإيجار",
-                                                        textAlign: TextAlign.center,
+                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"Modify your vehicle data":" تعديل بيانات سيارتك",                                                      textAlign: TextAlign.center,
                                                         style: TextStyle(
                                                           fontSize: 20,
                                                           letterSpacing: 0,
@@ -138,7 +137,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                       ),
                                                       // The text inside
                                                       CustomText(
-                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"Adding Car For Rent":"إضافة سيارة للإيجار",
+                                                        Get.find<StorageService>().activeLocale == SupportedLocales.english?"Modify your vehicle data":" تعديل بيانات سيارتك",
                                                         textAlign: TextAlign.center,
                                                         style:  TextStyle(
                                                           fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
@@ -146,12 +145,12 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                           fontWeight: FontWeight.w800,
                                                           fontSize: 20,
                                                           letterSpacing: 0,
-            
+
                                                         ),
                                                       )
                                                     ],
                                                   ),
-            
+
                                                 ],
                                               ),
                                             ),
@@ -165,7 +164,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             color: kDarkGreenColor,
                                             child: Container(
                                               width: Get.width*0.2,
-            
+
                                               decoration:  BoxDecoration(
                                                   color: kWhiteColor,
                                                   borderRadius: Get.find<StorageService>().activeLocale == SupportedLocales.english?const BorderRadius.only(
@@ -194,21 +193,22 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-            
+
                                       ],
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-            
-            
-            
+
+
+
                           ],
                         ),
                       ),
                     ),
-                    controller.isLoading? Loader(height: Get.height*0.87,):Container(
+                    controller.isLoading? Loader(height: Get.height*0.87,):
+                    Container(
                       height: Get.height*0.81,
                       child: SingleChildScrollView(
                         controller:controller.scrollController,
@@ -222,8 +222,8 @@ class AddingCarForRentScreen extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       const SizedBox(height: 10,),
-            
-            
+
+
                                       Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                                         child: CustomText(
@@ -256,9 +256,9 @@ class AddingCarForRentScreen extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-            
+
                                       const SizedBox(height: 10,),
-            
+
                                       Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
                                         child: SizedBox(
@@ -292,407 +292,12 @@ class AddingCarForRentScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  controller.imagesFile.isEmpty?const SizedBox(
-                                    height: 20,
-                                  ):const SizedBox(
-                                    height: 10,
-                                  ),
-                                  controller.nameController.text.trim().isEmpty?const SizedBox():controller.imagesFile.isEmpty||controller.imagesFile.length<6? InkWell(
-                                    onTap: (){
-                                      controller.getImages(context);
-                                    },
-            
-            
-                                    child: Center(
-                                      child: Container(
-                                        width: Get.width*0.9,
-                                        height: Get.height*0.19,
-                                        decoration:  const BoxDecoration(
-                                          color: Colors.transparent,
-            
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            SizedBox(
-                                              width: Get.width*0.9,
-                                              height: Get.height*0.2,
-                                            ),
-                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?Positioned(
-                                                bottom: 0,
-                                                left: 0,
-                                                child: Container(
-                                                  width: Get.width*0.85,
-                                                  height: Get.height*0.12,
-                                                  decoration:   BoxDecoration(
-                                                    color: kDarkGreenColor,
-                                                    borderRadius: BorderRadius.circular(25),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                                        child: CustomText(
-                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"You Must Add 1 to 6 Images For The Car":"يجب عليك إضافة 1 إلى 6 صور للسيارة",
-                                                          style:  TextStyle(
-                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                            color: kWhiteColor,
-                                                            fontWeight: FontWeight.w800,
-                                                            fontSize: 20,
-            
-                                                            height: 1,
-                                                            letterSpacing: -1,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                            ):Positioned(
-                                                bottom: 0,
-                                                right: 0,
-                                                child: Container(
-                                                  width: Get.width*0.85,
-                                                  height: Get.height*0.12,
-                                                  decoration:   BoxDecoration(
-                                                    color: kDarkGreenColor,
-                                                    borderRadius: BorderRadius.circular(25),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                                        child: SizedBox(
-                                                          width: Get.width*0.45,
-                                                          child: CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?" Add 1 to 6 Images For The Car":"أضف من ١ إلى ٦ صور للسيارة.",
-                                                            textAlign: TextAlign.center,
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 20,
-                                                              height: 1.2,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                            ),
-                                            Get.find<StorageService>().activeLocale == SupportedLocales.english? Positioned(
-                                              right: 0.0,
-                                              top: 0.0,
-                                              child:Container(
-                                                width: Get.width*0.4,
-                                                height: Get.height*0.15,
-                                                decoration:   BoxDecoration(
-                                                  color: kGreyColor,
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(color: Colors.white,width: 2.0),
-                                                ),
-                                                child: const Center(
-                                                  child: Icon(Icons.camera_enhance,color: kDarkGreenColor,size: 50,),
-            
-                                                ),
-                                              ),
-                                            ):Positioned(
-                                              left: 0.0,
-                                              top: 0.0,
-                                              child:Container(
-                                                width: Get.width*0.4,
-                                                height: Get.height*0.15,
-                                                decoration:   BoxDecoration(
-                                                  color: kGreyColor,
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(color: Colors.white,width: 3.0),
-            
-                                                ),
-                                                child: const Center(
-                                                  child: Icon(Icons.camera_enhance,color: kDarkGreenColor,size: 50,),
-                                                ),
-                                              ),
-                                            ),
-            
-            
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ):SizedBox(),
-                                  controller.imagesFile.isEmpty?SizedBox()  :Center(
-                                        child: ImageShowWidget(
-                                                                            index: controller.index,
-                                                                            getNextImage: (){
-                                        controller.getNextImages();
-                                                                            },
-                                                                            getPreviousImage: (){
-                                        controller.getPrevImages();
-                                                                            },
-                                                                            chooseAnotherImage: (){
-                                        controller.editingImage();
-                                                                            },
-                                                                            deleteImage: (){
-                                        controller.deleteImage();
-                                                                            },
-                                                                            images: controller.imagesFile,
-            
-                                                                          ),
-                                      ),
-                                  controller.imagesFile.isEmpty?const SizedBox(
-                                    height: 20,
-                                  ):const SizedBox(
-                                    height: 10,
-                                  ),
-                                  controller.imagesFile.isEmpty?const SizedBox():
+
+                                  controller.nameController.text.trim().isEmpty?const SizedBox():
                                   const SizedBox(height: 10,),
-                                  controller.imagesFile.isEmpty?const SizedBox(
-                                    height: 20,
-                                  ):const SizedBox(
-                                    height: 10,
-                                  ),
-                                  controller.imagesFile.isEmpty?SizedBox():(controller.positionOfTheCar?.isBlank??true)? InkWell(
-                                    onTap: (){
-                                     Get.to(()=> MapScreen());
-                                     controller.scrollToBottom();
-                                    },
-            
-            
-                                    child: Center(
-                                      child: Container(
-                                        width: Get.width*0.9,
-                                        height: Get.height*0.19,
-                                        decoration:  const BoxDecoration(
-                                          color: Colors.transparent,
-            
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            SizedBox(
-                                              width: Get.width*0.9,
-                                              height: Get.height*0.2,
-                                            ),
-                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?Positioned(
-                                                bottom: 0,
-                                                left: 0,
-                                                child: Container(
-                                                  width: Get.width*0.85,
-                                                  height: Get.height*0.12,
-                                                  decoration:   BoxDecoration(
-                                                    color: kDarkGreenColor,
-                                                    borderRadius: BorderRadius.circular(25),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                                        child: CustomText(
-                                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?" choose the location of The Car":"أختر موقع السيارة.",
-                                                          style:  TextStyle(
-                                                            fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                            color: kWhiteColor,
-                                                            fontWeight: FontWeight.w800,
-                                                            fontSize: 20,
-            
-                                                            height: 1,
-                                                            letterSpacing: -1,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                            ):Positioned(
-                                                bottom: 0,
-                                                right: 0,
-                                                child: Container(
-                                                  width: Get.width*0.85,
-                                                  height: Get.height*0.12,
-                                                  decoration:   BoxDecoration(
-                                                    color: kDarkGreenColor,
-                                                    borderRadius: BorderRadius.circular(25),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                                        child: SizedBox(
-                                                          width: Get.width*0.45,
-                                                          child: CustomText(
-                                                            Get.find<StorageService>().activeLocale == SupportedLocales.english?" choose the location of The Car":"أختر موقع السيارة.",
-                                                            textAlign: TextAlign.center,
-                                                            style:  TextStyle(
-                                                              fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                              color: kWhiteColor,
-                                                              fontSize: 20,
-                                                              height: 1.2,
-                                                              letterSpacing: -1,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                            ),
-                                            Get.find<StorageService>().activeLocale == SupportedLocales.english? Positioned(
-                                              right: 0.0,
-                                              top: 0.0,
-                                              child:Container(
-                                                width: Get.width*0.4,
-                                                height: Get.height*0.15,
-                                                decoration:   BoxDecoration(
-                                                  color: kGreyColor,
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(color: Colors.white,width: 2.0),
-                                                ),
-                                                child: const Center(
-                                                  child: Icon(Icons.add_location_alt,color: kDarkGreenColor,size: 50,),
-            
-                                                ),
-                                              ),
-                                            ):Positioned(
-                                              left: 0.0,
-                                              top: 0.0,
-                                              child:Container(
-                                                width: Get.width*0.4,
-                                                height: Get.height*0.15,
-                                                decoration:   BoxDecoration(
-                                                  color: kGreyColor,
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(color: Colors.white,width: 3.0),
-            
-                                                ),
-                                                child: const Center(
-                                                  child: Icon(Icons.add_location_alt,color: kDarkGreenColor,size: 50,),
-                                                ),
-                                              ),
-                                            ),
-            
-            
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ):
-                                  Center(
-                                    child: Container(
-                                        width: Get.width*0.9,
-                                      height: Get.height*0.3,
-                                      decoration:   BoxDecoration(
-                                        color: kDarkGreenColor,
-                                        borderRadius: BorderRadius.circular(25),
-                                      ),
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            SizedBox(
-                                              height: 150,
-                                              child: DecoratedBox(
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(20)),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      offset: Offset(0, 2),
-                                                      blurRadius: 6,
-                                                      color: Colors.black12,
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: controller.mapIsLoading
-                                                    ? const Center(
-                                                  child:
-                                                  CircularProgressIndicator(),
-                                                )
-                                                    : Padding(
-                                                  padding:
-                                                  const EdgeInsets.all(10.0),
-                                                  child: Container(
-                                                    width: Get.width * 0.9,
-                                                    decoration:
-                                                    const BoxDecoration(
-                                                      borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              20)),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          offset: Offset(0, 2),
-                                                          blurRadius: 6,
-                                                          color: Colors.black12,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: GoogleMap(
-                                                      zoomControlsEnabled: false,
-                                                      scrollGesturesEnabled:
-                                                      false,
-                                                      compassEnabled: false,
-                                                      mapToolbarEnabled: false,
-                                                      rotateGesturesEnabled:
-                                                      false,
-                                                      tiltGesturesEnabled: false,
-                                                      zoomGesturesEnabled: false,
-                                                      myLocationButtonEnabled:
-                                                      false,
-                                                      mapType: MapType.normal,
-                                                      markers: Set<Marker>.of(
-                                                          controller
-                                                              .markers.values),
-                                                      initialCameraPosition:
-                                                      CameraPosition(
-                                                        target: LatLng(
-                                                            controller.positionOfTheCar?.latitude??0.0,
-                                                            controller.positionOfTheCar?.longitude??0.0),
-                                                        zoom: 17.0,
-                                                      ),
-                                                      onMapCreated:
-                                                          (GoogleMapController
-                                                      mcontroller) {
-                                                        controller.mapController =
-                                                            mcontroller;
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 10.0,horizontal: 10.0),
-                                              child: CustomText(
-                                                controller.address.value,
-                                                textAlign: TextAlign.center,
-                                                style:  TextStyle(
-
-                                                  fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
-                                                  color: kWhiteColor,
-                                                  fontWeight: FontWeight.w800,
-                                                  fontSize: 20,
-
-                                                  height: 1,
-                                                  letterSpacing: -1,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
 
 
-                                  (controller.positionOfTheCar?.isBlank??true)? SizedBox():
+                                  controller.nameController.text.trim().isEmpty?const SizedBox():
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -730,7 +335,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(height: 10,),
-            
+
                                       Center(
                                         child: InkWell(
                                           onTap: (){
@@ -741,17 +346,17 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             child: Container(
                                               width:Get.width*0.9,
                                               height:Get.height*0.06,
-            
+
                                               decoration: BoxDecoration(
-            
+
                                                   borderRadius: BorderRadius.circular(50),
                                                   border: Border.all(color: kDarkGreenColor,width: 2)
-            
+
                                               ),
                                               child:Padding(
                                                 padding: const EdgeInsets.all(5.0),
                                                 child: Container(
-            
+
                                                   decoration: BoxDecoration(
                                                     color: kDarkBlueColor,
                                                     borderRadius: BorderRadius.circular(50),
@@ -791,10 +396,10 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                               return Container(
                                                                   height: Get.height * 0.04,
                                                                   width: Get.width * 0.07,
-            
+
                                                                   decoration: BoxDecoration(
                                                                     borderRadius: BorderRadius.circular(10),
-            
+
                                                                     image: DecorationImage(
                                                                       image: image,
                                                                       fit: BoxFit.fitWidth,
@@ -819,9 +424,9 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                               return Container(
                                                                   height: Get.height * 0.04,
                                                                   width: Get.width * 0.07,
-            
+
                                                                   decoration: const BoxDecoration(
-            
+
                                                                       image: DecorationImage(
                                                                         image: AssetImage(
                                                                             "assets/images/27002.jpg"),
@@ -861,13 +466,13 @@ class AddingCarForRentScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  (controller.positionOfTheCar?.isBlank??true)? SizedBox():controller.chosenCountry == null?const SizedBox():
+                                  controller.nameController.text.trim().isEmpty?const SizedBox():controller.chosenCountry == null?const SizedBox():
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       const SizedBox(height: 10,),
-            
-            
+
+
                                       Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                                         child: CustomText(
@@ -900,9 +505,9 @@ class AddingCarForRentScreen extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-            
+
                                       const SizedBox(height: 10,),
-            
+
                                       InkWell(
                                         onTap: (){
                                           controller.choosingCities(context);
@@ -913,17 +518,17 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             child: Container(
                                               width:Get.width*0.9,
                                               height:Get.height*0.06,
-            
+
                                               decoration: BoxDecoration(
-            
+
                                                   borderRadius: BorderRadius.circular(50),
                                                   border: Border.all(color: kDarkGreenColor,width: 2)
-            
+
                                               ),
                                               child:Padding(
                                                 padding: const EdgeInsets.all(5.0),
                                                 child: Container(
-            
+
                                                   decoration: BoxDecoration(
                                                     color: kDarkBlueColor,
                                                     borderRadius: BorderRadius.circular(50),
@@ -985,8 +590,8 @@ class AddingCarForRentScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                controller.chosenCity == null?const SizedBox():
-            
+                                  controller.chosenCity == null?const SizedBox():
+
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -1024,7 +629,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(height: 10,),
-            
+
                                       InkWell(
                                         onTap: (){
                                           controller.choosingCarBrands(context);
@@ -1035,17 +640,17 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             child: Container(
                                               width:Get.width*0.9,
                                               height:Get.height*0.06,
-            
+
                                               decoration: BoxDecoration(
-            
+
                                                   borderRadius: BorderRadius.circular(50),
                                                   border: Border.all(color: kDarkGreenColor,width: 2)
-            
+
                                               ),
                                               child:Padding(
                                                 padding: const EdgeInsets.all(5.0),
                                                 child: Container(
-            
+
                                                   decoration: BoxDecoration(
                                                     color: kDarkBlueColor,
                                                     borderRadius: BorderRadius.circular(50),
@@ -1145,7 +750,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(height: 10,),
-            
+
                                       InkWell(
                                         onTap:(){
                                           controller.choosingCarModels(context);
@@ -1156,17 +761,17 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             child: Container(
                                               width:Get.width*0.9,
                                               height:Get.height*0.06,
-            
+
                                               decoration: BoxDecoration(
-            
+
                                                   borderRadius: BorderRadius.circular(50),
                                                   border: Border.all(color: kDarkGreenColor,width: 2)
-            
+
                                               ),
                                               child:Padding(
                                                 padding: const EdgeInsets.all(5.0),
                                                 child: Container(
-            
+
                                                   decoration: BoxDecoration(
                                                     color: kDarkBlueColor,
                                                     borderRadius: BorderRadius.circular(50),
@@ -1228,7 +833,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-            
+
                                   controller.chosenCarModel == null?const SizedBox():
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1267,7 +872,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(height: 10,),
-            
+
                                       Center(
                                         child: PopupMenuButton<String>(
                                           constraints: BoxConstraints(
@@ -1279,13 +884,13 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                 return PopupMenuItem(
                                                   value: e,
                                                   textStyle: TextStyle(
-                                                      color: kDarkGreenColor,
-                                                      fontFamily:
-                                                      Get.find<StorageService>().activeLocale ==
-                                                          SupportedLocales.english
-                                                          ? fontFamilyEnglishName
-                                                          : fontFamilyArabicName,
-                                                      ),
+                                                    color: kDarkGreenColor,
+                                                    fontFamily:
+                                                    Get.find<StorageService>().activeLocale ==
+                                                        SupportedLocales.english
+                                                        ? fontFamilyEnglishName
+                                                        : fontFamilyArabicName,
+                                                  ),
                                                   onTap: () {
                                                     controller.choosingInsuranceType(e);
                                                   },
@@ -1326,7 +931,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                                 const SizedBox(
                                                                   width: 20,
                                                                 ),
-            
+
                                                                 CustomText(
                                                                   e,
                                                                   style:  TextStyle(
@@ -1364,17 +969,17 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             child: Container(
                                               width:Get.width*0.9,
                                               height:Get.height*0.06,
-            
+
                                               decoration: BoxDecoration(
-            
+
                                                   borderRadius: BorderRadius.circular(50),
                                                   border: Border.all(color: kDarkGreenColor,width: 2)
-            
+
                                               ),
                                               child:Padding(
                                                 padding: const EdgeInsets.all(5.0),
                                                 child: Container(
-            
+
                                                   decoration: BoxDecoration(
                                                     color: kDarkBlueColor,
                                                     borderRadius: BorderRadius.circular(50),
@@ -1476,7 +1081,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                       const SizedBox(height: 10,),
                                       Center(
                                         child: InkWell(
-            
+
                                           onTap:(){
                                             controller.choosingWithPeriods(context);
                                           },
@@ -1485,17 +1090,17 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             child: Container(
                                               width:Get.width*0.9,
                                               height:Get.height*0.06,
-            
+
                                               decoration: BoxDecoration(
-            
+
                                                   borderRadius: BorderRadius.circular(50),
                                                   border: Border.all(color: kDarkGreenColor,width: 2)
-            
+
                                               ),
                                               child:Padding(
                                                 padding: const EdgeInsets.all(5.0),
                                                 child: Container(
-            
+
                                                   decoration: BoxDecoration(
                                                     color: kDarkBlueColor,
                                                     borderRadius: BorderRadius.circular(50),
@@ -1595,9 +1200,9 @@ class AddingCarForRentScreen extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(height: 10,),
-            
+
                                       InkWell(
-            
+
                                         onTap:(){
                                           controller.choosingWithDriverOrNot(context);
                                         },
@@ -1607,17 +1212,17 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             child: Container(
                                               width:Get.width*0.9,
                                               height:Get.height*0.06,
-            
+
                                               decoration: BoxDecoration(
-            
+
                                                   borderRadius: BorderRadius.circular(50),
                                                   border: Border.all(color: kDarkGreenColor,width: 2)
-            
+
                                               ),
                                               child:Padding(
                                                 padding: const EdgeInsets.all(5.0),
                                                 child: Container(
-            
+
                                                   decoration: BoxDecoration(
                                                     color: kDarkBlueColor,
                                                     borderRadius: BorderRadius.circular(50),
@@ -1648,7 +1253,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                               letterSpacing: -1,
                                                             ),
                                                           ),
-            
+
                                                         ],
                                                       ),
                                                       const SizedBox(width: 10,),
@@ -1713,12 +1318,12 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                 return PopupMenuItem(
                                                   value: e.year,
                                                   textStyle: TextStyle(
-                                                      color: kDarkGreenColor,
-                                                      fontFamily:
-                                                      Get.find<StorageService>().activeLocale ==
-                                                          SupportedLocales.english
-                                                          ? fontFamilyEnglishName
-                                                          : fontFamilyArabicName,),
+                                                    color: kDarkGreenColor,
+                                                    fontFamily:
+                                                    Get.find<StorageService>().activeLocale ==
+                                                        SupportedLocales.english
+                                                        ? fontFamilyEnglishName
+                                                        : fontFamilyArabicName,),
                                                   onTap: () {
                                                     controller.choosingYear(e);
                                                   },
@@ -1759,7 +1364,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                                 const SizedBox(
                                                                   width: 20,
                                                                 ),
-            
+
                                                                 CustomText(
                                                                   e.year??"",
                                                                   style:  TextStyle(
@@ -1797,17 +1402,17 @@ class AddingCarForRentScreen extends StatelessWidget {
                                             child: Container(
                                               width:Get.width*0.8,
                                               height:Get.height*0.06,
-            
+
                                               decoration: BoxDecoration(
-            
+
                                                   borderRadius: BorderRadius.circular(50),
                                                   border: Border.all(color: kDarkGreenColor,width: 2)
-            
+
                                               ),
                                               child:Padding(
                                                 padding: const EdgeInsets.all(5.0),
                                                 child: Container(
-            
+
                                                   decoration: BoxDecoration(
                                                     color: kDarkBlueColor,
                                                     borderRadius: BorderRadius.circular(50),
@@ -1848,8 +1453,8 @@ class AddingCarForRentScreen extends StatelessWidget {
                                                               letterSpacing: -1,
                                                             ),
                                                           ),
-            
-            
+
+
                                                         ],
                                                       ),
                                                       const SizedBox(width: 10,),
@@ -1865,42 +1470,42 @@ class AddingCarForRentScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-            
-            
-            
+
+
+
                                 ],
                               ),
                             ),
-            
+
                             controller.chosenYear == null?const SizedBox():Center(
                               child: InkWell(
                                 onTap: (){
-                                  controller.addingCarToRent(context);
-            
-            
+                                  controller.editingCarToRent(context);
+
+
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Container(
                                     width:Get.width*0.8,
                                     height:Get.height*0.09,
-            
+
                                     decoration: BoxDecoration(
-            
+
                                         borderRadius: BorderRadius.circular(50),
                                         border: Border.all(color: kDarkGreenColor,width: 2)
-            
+
                                     ),
                                     child:Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: Container(
-            
+
                                         decoration: BoxDecoration(
                                           color: kDarkBlueColor,
                                           borderRadius: BorderRadius.circular(50),
                                         ),
                                         child:  Center(child: CustomText(
-                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"Add Car To Rent":"أضف سيارة للإيجار",
+                                          Get.find<StorageService>().activeLocale == SupportedLocales.english?"Modify your vehicle data":" تعديل بيانات سيارتك",
                                           style:  TextStyle(
                                             fontFamily: Get.find<StorageService>().activeLocale == SupportedLocales.english?fontFamilyEnglishName:fontFamilyArabicName,
                                             color: kWhiteColor,
@@ -1921,7 +1526,7 @@ class AddingCarForRentScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-            
+
                   ],
                 ),
               ),
