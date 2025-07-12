@@ -247,6 +247,8 @@ class LoginController extends GetxController{
   choosingAnotherCountryCode(CountryCodeModel chosenCountryCode,BuildContext context){
     selectedCountryCode = chosenCountryCode;
     isFoundCountry = true;
+    changeButtonStatus();
+
     update();
     Navigator.pop(context);
   }
@@ -422,50 +424,65 @@ class LoginController extends GetxController{
         middleText: err);
   }
   sinningIn(context) async {
-
-        if( buttonStatus != "loading"){
-          buttonStatus = "loading";
+    if(selectedCountryCode != null) {
+      if (buttonStatus != "loading") {
+        buttonStatus = "loading";
+        update();
+        AuthModel? data = await AuthServices.logIn(
+          selectedCountryCode?.code ?? "",
+          phoneController.text ?? "",
+        );
+        print(data?.status);
+        if (data?.status == "true") {
+          await Get.find<StorageService>().saveAccountId(
+              "${data?.info?.id ?? 0}");
+          await Get.find<StorageService>().saveAccountOtp(
+              "${data?.info?.opt ?? 0}");
+          await Get.find<StorageService>().saveAccountName(
+              data?.info?.name ?? "");
+          await Get.find<StorageService>().saveUserPhoneNumber(
+              " ${phoneController.text ?? ""}");
+          await Get.find<StorageService>().saveUserCountryCode(
+              " ${selectedCountryCode?.code ?? ""}");
+          await Get.find<StorageService>().saveCheckerSigningUp(false);
+          buttonStatus = "success";
           update();
-          AuthModel? data = await AuthServices.logIn(
-            selectedCountryCode?.code ?? "",
-            phoneController.text ?? "",
-          );
-          print(data?.status);
-          if (data?.status == "true") {
-            await Get.find<StorageService>().saveAccountId(
-                "${data?.info?.id ?? 0}");
-            await Get.find<StorageService>().saveAccountOtp(
-                "${data?.info?.opt ?? 0}");
-            await Get.find<StorageService>().saveAccountName(
-                data?.info?.name ?? "");
-            await Get.find<StorageService>().saveUserPhoneNumber(
-                " ${phoneController.text ?? ""}");
-            await Get.find<StorageService>().saveUserCountryCode(
-                " ${selectedCountryCode?.code ?? ""}");
-            await Get.find<StorageService>().saveCheckerSigningUp(false);
-            buttonStatus = "success";
-            update();
-            await Get.to(() =>
-             OtpScreen(
-              comingFromSignUp: false));
-          } else {
-            buttonStatus = "failed";
-            update();
-            AwesomeDialog(
-              context: context,
-              dialogType: DialogType.error,
-              animType: AnimType.rightSlide,
-              title: errorKey.tr,
-              desc: Get
-                  .find<StorageService>()
-                  .activeLocale == SupportedLocales.english
-                  ? data?.msg ?? ""
-                  : data?.msgAr ?? "",
-              btnCancelOnPress: () {},
-              btnOkOnPress: () {},
-            ).show();
-          }
+          await Get.to(() =>
+              OtpScreen(
+                  comingFromSignUp: false));
+        } else {
+          buttonStatus = "failed";
+          update();
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            animType: AnimType.rightSlide,
+            title: errorKey.tr,
+            desc: Get
+                .find<StorageService>()
+                .activeLocale == SupportedLocales.english
+                ? data?.msg ?? ""
+                : data?.msgAr ?? "",
+            btnCancelOnPress: () {},
+            btnOkOnPress: () {},
+          ).show();
         }
+      }
+    }else{
+      buttonStatus = "failed";
+      update();
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.rightSlide,
+        title: errorKey.tr,
+        desc: Get.find<StorageService>().activeLocale ==
+            SupportedLocales.english
+            ?"You must select a country code.":"يجب عليك أختيار مفتاح رقم الدولة",
+        btnCancelOnPress: () {},
+        btnOkOnPress: () {},
+      ).show();
+    }
 
   }
   @override

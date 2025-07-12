@@ -133,7 +133,7 @@ class SignInScreen extends StatelessWidget {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  CachedNetworkImage(
+                                  controller.selectedCountryCode?.code==null?const Icon(Icons.warning_amber,color: kDarkBlueColor,): CachedNetworkImage(
                                     imageUrl:"${Services.baseEndPoint}${controller.selectedCountryCode?.flag}",
                                     imageBuilder: ((context, image) {
                                       return Container(
@@ -187,7 +187,7 @@ class SignInScreen extends StatelessWidget {
                                     width: 5,
                                   ),
                                   CustomText(
-                                    "   ${controller.selectedCountryCode?.code??"wait"}    ",
+                                    "   ${controller.selectedCountryCode?.code??(Get.find<StorageService>().activeLocale == SupportedLocales.english ?"choose":"أختر")}    ",
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       fontFamily: Get.find<
@@ -216,7 +216,7 @@ class SignInScreen extends StatelessWidget {
                               child: (controller.isFoundCountry)?Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  CachedNetworkImage(
+                                  controller.selectedCountryCode?.code==null?const Icon(Icons.warning_amber,color: kDarkBlueColor,):CachedNetworkImage(
                                     imageUrl:"${Services.baseEndPoint}${controller.selectedCountryCode?.flag}",
                                     imageBuilder: ((context, image) {
                                       return Container(
@@ -271,7 +271,7 @@ class SignInScreen extends StatelessWidget {
                                   ),
 
                                   CustomText(
-                                    "   ${controller.selectedCountryCode?.code??"wait"}    ",
+                                    "   ${controller.selectedCountryCode?.code??(Get.find<StorageService>().activeLocale == SupportedLocales.english ?"choose":"أختر")}    ",
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       fontFamily: Get.find<
@@ -301,7 +301,7 @@ class SignInScreen extends StatelessWidget {
                                   ),
 
                                   CustomText(
-                                    "choose",
+                                    (Get.find<StorageService>().activeLocale == SupportedLocales.english ?"choose":"أختر"),
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       fontFamily: Get.find<
@@ -325,10 +325,10 @@ class SignInScreen extends StatelessWidget {
                               onTap: (){
                                 controller. choosingCountryCode( context);
                               },
-                              child: (controller.isFoundCountry)?Row(
+                              child:(controller.isFoundCountry)? Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  CachedNetworkImage(
+                                  controller.selectedCountryCode?.code==null?const Icon(Icons.warning_amber,color: kDarkBlueColor,): CachedNetworkImage(
                                     imageUrl:"${Services.baseEndPoint}${controller.selectedCountryCode?.flag}",
                                     imageBuilder: ((context, image) {
                                       return Container(
@@ -382,7 +382,7 @@ class SignInScreen extends StatelessWidget {
                                     width: 5,
                                   ),
                                   CustomText(
-                                    "   ${controller.selectedCountryCode?.code??"wait"}    ",
+                                    "   ${controller.selectedCountryCode?.code??(Get.find<StorageService>().activeLocale == SupportedLocales.english ?"choose":"أختر")}    ",
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       fontFamily: Get.find<
@@ -405,7 +405,7 @@ class SignInScreen extends StatelessWidget {
                                   ),
 
                                   CustomText(
-                                    "choose",
+                                    (Get.find<StorageService>().activeLocale == SupportedLocales.english ?"choose":"أختر"),
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       fontFamily: Get.find<

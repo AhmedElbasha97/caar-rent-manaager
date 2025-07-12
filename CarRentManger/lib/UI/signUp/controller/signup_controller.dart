@@ -291,7 +291,7 @@ SignUpController(this.context);
   choosingAnotherCountryCode(CountryCodeModel chosenCountryCode,BuildContext context){
     selectedCountryCode = chosenCountryCode;
     isFoundCountry = true;
-
+    changeButtonStatus();
     update();
     Navigator.pop(context);
   }
@@ -484,32 +484,51 @@ SignUpController(this.context);
 
       buttonStatus = "loading";
       update();
-      if(val == 1) {
-        AuthModel? data = await AuthServices.signingUp(
-          nameController.text ?? "",
-          selectedCountryCode?.code ?? "",
-          phoneController.text ?? "",
-          emailController.text ?? "",
-        );
-        print(data?.status);
-        if (data?.status == "true") {
-          await Get.find<StorageService>().saveAccountId(
-              "${data?.info?.id ?? 0}");
-          await Get.find<StorageService>().saveAccountOtp(
-              "${data?.info?.opt ?? 0}");
-          await Get.find<StorageService>().saveAccountName(
-              data?.info?.name ?? "");
-          await Get.find<StorageService>().saveUserPhoneNumber(
-              " ${phoneController.text ?? ""}");
-          await Get.find<StorageService>().saveUserCountryCode(
-              " ${selectedCountryCode?.code ?? ""}");
-          await Get.find<StorageService>().saveCheckerSigningUp(true);
-          buttonStatus = "success";
-          update();
-          await Get.to(() =>
-          const OtpScreen(
-            comingFromSignUp: true));
-        } else {
+      if(selectedCountryCode != null) {
+        if (val == 1) {
+          AuthModel? data = await AuthServices.signingUp(
+            nameController.text ?? "",
+            selectedCountryCode?.code ?? "",
+            phoneController.text ?? "",
+            emailController.text ?? "",
+          );
+          print(data?.status);
+          if (data?.status == "true") {
+            await Get.find<StorageService>().saveAccountId(
+                "${data?.info?.id ?? 0}");
+            await Get.find<StorageService>().saveAccountOtp(
+                "${data?.info?.opt ?? 0}");
+            await Get.find<StorageService>().saveAccountName(
+                data?.info?.name ?? "");
+            await Get.find<StorageService>().saveUserPhoneNumber(
+                " ${phoneController.text ?? ""}");
+            await Get.find<StorageService>().saveUserCountryCode(
+                " ${selectedCountryCode?.code ?? ""}");
+            await Get.find<StorageService>().saveCheckerSigningUp(true);
+            buttonStatus = "success";
+            update();
+            await Get.to(() =>
+            const OtpScreen(
+                comingFromSignUp: true));
+          } else {
+            buttonStatus = "failed";
+            update();
+            AwesomeDialog(
+              context: context,
+              dialogType: DialogType.error,
+              animType: AnimType.rightSlide,
+              title: errorKey.tr,
+              desc: Get
+                  .find<StorageService>()
+                  .activeLocale == SupportedLocales.english
+                  ? data?.msg ?? ""
+                  : data?.msgAr ?? "",
+              btnCancelOnPress: () {},
+              btnOkOnPress: () {},
+            ).show();
+          }
+        }
+        else {
           buttonStatus = "failed";
           update();
           AwesomeDialog(
@@ -517,11 +536,7 @@ SignUpController(this.context);
             dialogType: DialogType.error,
             animType: AnimType.rightSlide,
             title: errorKey.tr,
-            desc: Get
-                .find<StorageService>()
-                .activeLocale == SupportedLocales.english
-                ? data?.msg ?? ""
-                : data?.msgAr ?? "",
+            desc: "يجب عليك الموافقه على الشروط والأحكام و سياسه الخصوصيه الخاصه بالتطبيق",
             btnCancelOnPress: () {},
             btnOkOnPress: () {},
           ).show();
@@ -534,7 +549,9 @@ SignUpController(this.context);
           dialogType: DialogType.error,
           animType: AnimType.rightSlide,
           title: errorKey.tr,
-          desc:"يجب عليك الموافقه على الشروط والأحكام و سياسه الخصوصيه الخاصه بالتطبيق",
+          desc: Get.find<StorageService>().activeLocale ==
+              SupportedLocales.english
+              ?"You must select a country code.":"يجب عليك أختيار مفتاح رقم الدولة",
           btnCancelOnPress: () {},
           btnOkOnPress: () {},
         ).show();
